@@ -1,0 +1,67 @@
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Maven
+target/
+!.mvn/wrapper/maven-wrapper.jar
+
+# Logs
+*.log
+logs/
+
+# H2 Database
+*.mv.db
+*.trace.db
+*.lock.db
+data/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Claude
+.claude/
+
+# Environment
+.env
+
+# Archive
+*.zip
+*.tar.gz
+*.7z
+*.rar
+
+# Python
+__pycache__/
+*.pyc
+
+# Screenshots
+*.png
+
+# Dev docs (not for repo)
+api-design.md
+API_INTEGRATION_GUIDE.md
+
+# Test files
+api_test.html
+logs.html
+
+# Extra HTML variants (not main pages)
+admin_competitions.html
+admin_students.html
+admin_teachers.html
+teacher_active.html
+teacher_competitions.html
+teacher_registrations.html
+
+# Scripts
+pack.py
+
+# Playwright MCP
+.playwright-mcp/
+
+# Sensitive/temp files
+token.txt
+login.json

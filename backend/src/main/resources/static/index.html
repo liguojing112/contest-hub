@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>河南科技职业大学竞赛管理系统</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/antd@5.12.8/dist/reset.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Microsoft YaHei', 'PingFang SC', sans-serif;
+      background-color: #f5f5f5;
+      color: #333;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px 0;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .nav {
+      display: flex;
+      gap: 20px;
+    }
+
+    .nav a {
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+      transition: opacity 0.3s;
+    }
+
+    .nav a:hover {
+      opacity: 0.8;
+    }
+
+    .login-section {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+      padding: 40px;
+      margin: 40px auto;
+      max-width: 400px;
+    }
+
+    .login-title {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #333;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: #666;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      font-size: 14px;
+      transition: all 0.3s;
+    }
+
+    .password-input-container {
+      position: relative;
+    }
+
+    .password-toggle {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: #999;
+    }
+
+    .password-toggle:hover {
+      color: #667eea;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+    }
+
+    .role-selector {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .role-option {
+      flex: 1;
+      text-align: center;
+      padding: 10px;
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .role-option.active {
+      background-color: #667eea;
+      color: white;
+      border-color: #667eea;
+    }
+
+    .login-btn {
+      width: 100%;
+      padding: 12px;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .login-btn:hover {
+      background: #5a6fe4;
+    }
+
+    .login-btn:disabled {
+      opacity: 0.75;
+      cursor: not-allowed;
+    }
+
+    .login-footer {
+      margin-top: 20px;
+      text-align: center;
+      font-size: 14px;
+      color: #999;
+    }
+
+    .login-footer a {
+      color: #667eea;
+      text-decoration: none;
+    }
+
+    .login-footer a:hover {
+      text-decoration: underline;
+    }
+
+    .feature-section {
+      margin: 60px 0;
+    }
+
+    .feature-title {
+      text-align: center;
+      font-size: 32px;
+      font-weight: bold;
+      margin-bottom: 40px;
+      color: #333;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
+
+    .feature-card {
+      background: white;
+      border-radius: 8px;
+      padding: 30px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .feature-icon {
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+      color: white;
+      font-size: 24px;
+    }
+
+    .feature-card h3 {
+      margin-bottom: 15px;
+      color: #333;
+    }
+
+    .nav a.active {
+      border-bottom: 2px solid white;
+      padding-bottom: 4px;
+    }
+
+    .page-section {
+      display: none;
+    }
+
+    .page-section.active {
+      display: block;
+    }
+
+    .auth-tabs {
+      display: flex;
+      gap: 0;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #e8e8e8;
+    }
+
+    .auth-tab {
+      flex: 1;
+      text-align: center;
+      padding: 12px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 500;
+      color: #666;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      transition: all 0.3s;
+      background: none;
+      border-top: none;
+      border-left: none;
+      border-right: none;
+    }
+
+    .auth-tab.active {
+      color: #667eea;
+      border-bottom-color: #667eea;
+    }
+
+    .auth-tab:hover {
+      color: #667eea;
+    }
+
+    .register-form {
+      display: none;
+    }
+
+    .register-form.active {
+      display: block;
+    }
+
+    .login-form {
+      display: none;
+    }
+
+    .login-form.active {
+      display: block;
+    }
+
+    .competition-card {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+      margin-bottom: 16px;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .competition-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    }
+
+    .comp-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .comp-card-header h3 {
+      margin: 0;
+      color: #333;
+    }
+
+    .comp-type-tag {
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      background: #e8f0fe;
+      color: #667eea;
+    }
+
+    .comp-info {
+      display: flex;
+      gap: 20px;
+      font-size: 13px;
+      color: #666;
+    }
+
+    .feature-card p {
+      color: #666;
+      line-height: 1.6;
+    }
+
+    .footer {
+      background: #333;
+      color: white;
+      padding: 40px 0;
+      margin-top: 60px;
+    }
+
+    .footer-content {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 40px;
+    }
+
+    .footer-section {
+      flex: 1;
+      min-width: 200px;
+      margin-bottom: 20px;
+    }
+
+    .footer-section h4 {
+      margin-bottom: 15px;
+      color: #667eea;
+    }
+
+    .footer-section p,
+    .footer-section a {
+      color: #ccc;
+      text-decoration: none;
+      line-height: 1.6;
+    }
+
+    .footer-section a:hover {
+      color: white;
+    }
+
+    .footer-bottom {
+      text-align: center;
+      padding-top: 20px;
+      margin-top: 20px;
+      border-top: 1px solid #444;
+      color: #999;
+    }
+  </style>
+</head>
+
+<body>
+  <header class="header">
+    <div class="container header-content">
+      <div class="logo">河南科技职业大学竞赛管理系统</div>
+      <nav class="nav">
+        <a href="#" class="active" data-page="home">首页</a>
+        <a href="#" data-page="auth">注册登录</a>
+        <a href="#" data-page="browse">浏览竞赛</a>
+        <a href="#" data-page="home" data-anchor="contact">联系我们</a>
+        <a href="forgot-password.html">忘记密码</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- ========== 首页 ========== -->
+    <div id="page-home" class="page-section active">
+      <div class="feature-section">
+        <h2 class="feature-title">关于我们</h2>
+        <div class="feature-grid">
+          <div class="feature-card">
+            <div class="feature-icon">🏫</div>
+            <h3>系统介绍</h3>
+            <p>高校竞赛管理系统是一个专为高校设计的综合性竞赛管理平台，旨在提高竞赛管理效率，促进师生参与。系统提供完整的竞赛管理流程，从竞赛发布、报名、团队管理到评审和结果公布。</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">🎯</div>
+            <h3>系统目标</h3>
+            <p>我们的目标是打造一个高效、便捷、用户友好的竞赛管理平台，帮助高校更好地组织和管理各类竞赛活动，激发学生的创新潜能，提高学生的实践能力和团队协作精神。</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">✨</div>
+            <h3>系统特色</h3>
+            <p>系统采用现代化的技术架构，具有界面美观、操作便捷、功能完善等特点。支持多角色管理、团队协作、在线评审等功能，为高校竞赛管理提供全方位的解决方案。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="feature-section">
+        <h2 class="feature-title">热门竞赛排行榜</h2>
+        <div id="rankingList" style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center;">
+          <div style="text-align:center;padding:40px;color:#999;">加载中...</div>
+        </div>
+      </div>
+
+      <div class="feature-section" id="contact">
+        <h2 class="feature-title">联系我们</h2>
+        <div class="feature-grid">
+          <div class="feature-card">
+            <div class="feature-icon">📞</div>
+            <h3>联系方式</h3>
+            <p>电话：<a href="tel:123-4567-8910" style="color: #667eea;">123-4567-8910</a></p>
+            <p>邮箱：<a href="mailto:contact@competition.edu" style="color: #667eea;">contact@competition.edu</a></p>
+            <p>地址：河南科技职业大学老综合楼101</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">🕒</div>
+            <h3>工作时间</h3>
+            <p id="workTimeWeekdays">周一至周五：9:00 - 17:00</p>
+            <p id="workTimeWeekends">周六至周日：休息</p>
+            <p id="workTimeHolidays">节假日：另行通知</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">💬</div>
+            <h3>反馈建议</h3>
+            <p>如果您对系统有任何意见或建议，欢迎通过上述方式联系我们，我们将及时回复并不断改进系统功能。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== 注册登录 ========== -->
+    <div id="page-auth" class="page-section">
+      <div class="login-section" style="max-width:450px;">
+        <div class="auth-tabs">
+          <button class="auth-tab active" onclick="switchAuthTab('login')">登录</button>
+          <button class="auth-tab" onclick="switchAuthTab('register')">注册</button>
+        </div>
+
+        <!-- 登录表单 -->
+        <div id="form-login" class="login-form active">
+          <form id="loginForm">
+            <div class="form-group">
+              <label for="username">账号</label>
+              <input type="text" id="username" name="username" placeholder="请输入账号">
+            </div>
+            <div class="form-group">
+              <label for="password">密码</label>
+              <div class="password-input-container">
+                <input type="password" id="password" name="password" placeholder="请输入密码">
+                <span class="password-toggle" onclick="togglePassword('password')">👁️</span>
+              </div>
+              <div id="passwordError" style="color: red; font-size: 12px; margin-top: 5px; display: none;"></div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 20px; font-size: 12px;">
+              <input type="checkbox" id="privacyConsent" name="privacyConsent" required style="margin: 0;">
+              <label for="privacyConsent" style="font-weight: normal; margin: 0;">我已阅读并同意 <a href="privacy.html" style="color: #667eea;">隐私政策</a></label>
+            </div>
+            <button type="submit" class="login-btn" id="loginBtn">登录</button>
+            <div class="login-footer">
+              <a href="forgot-password.html">忘记密码？</a>
+            </div>
+          </form>
+        </div>
+
+        <!-- 注册表单 -->
+        <div id="form-register" class="register-form">
+          <form id="registerForm">
+            <div class="form-group">
+              <label for="regUsername">账号 <span style="color:red;">*</span></label>
+              <input type="text" id="regUsername" placeholder="请输入用户名" required>
+            </div>
+            <div class="form-group">
+              <label for="regPassword">密码 <span style="color:red;">*</span></label>
+              <input type="password" id="regPassword" placeholder="请输入密码（至少6位）" required minlength="6">
+            </div>
+            <div class="form-group">
+              <label for="regName">姓名 <span style="color:red;">*</span></label>
+              <input type="text" id="regName" placeholder="请输入真实姓名" required>
+            </div>
+            <div class="form-group">
+              <label>角色 <span style="color:red;">*</span></label>
+              <div class="role-selector">
+                <div class="role-option active" data-role="STUDENT" onclick="selectRole(this)">学生</div>
+                <div class="role-option" data-role="TEACHER" onclick="selectRole(this)">教师</div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="regPhone">手机号 <span style="color:red;">*</span></label>
+              <input type="text" id="regPhone" placeholder="请输入手机号" required>
+            </div>
+            <div class="form-group">
+              <label for="regEmail">邮箱</label>
+              <input type="email" id="regEmail" placeholder="请输入邮箱（选填）">
+            </div>
+            <div id="regError" style="color:red;font-size:12px;margin-bottom:10px;display:none;"></div>
+            <button type="submit" class="login-btn" id="regBtn" style="background:#27ae60;">注册</button>
+            <div class="login-footer">
+              已有账号？<a href="#" onclick="switchAuthTab('login')">立即登录</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== 浏览竞赛 ========== -->
+    <div id="page-browse" class="page-section">
+      <div class="feature-section" style="margin-top:0;">
+        <h2 class="feature-title">浏览竞赛</h2>
+        <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;">
+          <input type="text" id="browseSearch" placeholder="搜索竞赛名称..." style="flex:1;min-width:200px;padding:10px;border:1px solid #d9d9d9;border-radius:4px;" oninput="filterBrowseComps()">
+          <select id="browseTypeFilter" onchange="filterBrowseComps()" style="padding:10px;border:1px solid #d9d9d9;border-radius:4px;">
+            <option value="">全部类型</option>
+          </select>
+        </div>
+        <div id="browseCompList" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(350px,1fr));gap:16px;">
+          <div style="text-align:center;padding:40px;color:#999;grid-column:1/-1;">加载中...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer" style="margin-top: 120px;">
+    <div class="container footer-content">
+      <div class="footer-section">
+        <h4>关于系统</h4>
+        <p>河南科技职业大学竞赛管理系统是一个专为我校设计的综合性竞赛管理平台，旨在提高竞赛管理效率，促进师生参与各类学科竞赛活动，为我校竞赛管理提供全方位的支持。</p>
+      </div>
+
+      <div class="footer-section">
+        <h4>快速链接</h4>
+        <p><a href="#" data-page="home" onclick="event.preventDefault();switchPage('home');">首页</a></p>
+        <p><a href="#" data-page="home" data-anchor="contact" onclick="event.preventDefault();switchPage('home','contact');">联系我们</a></p>
+      </div>
+
+      <div class="footer-section">
+        <h4>联系我们</h4>
+        <p>电话：<a href="tel:123-4567-8910" style="color: #ccc;">123-4567-8910</a></p>
+        <p>邮箱：<a href="mailto:contact@competition.edu" style="color: #ccc;">contact@competition.edu</a></p>
+        <p>地址：河南科技职业大学老综合楼101</p>
+      </div>
+    </div>
+
+    <div class="container footer-bottom">
+      <p>&copy; 2026 高校竞赛管理系统 版权所有</p>
+    </div>
+  </footer>
+
+  <script src="js/api.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+  <script>
+    // ==================== 页面切换 ====================
+    var allCompsData = [];
+
+    document.addEventListener('DOMContentLoaded', function () {
+      Logger.info('页面加载完成', {
+        page: '首页',
+        timestamp: new Date().toISOString(),
+        userAgent: navigator.userAgent
+      });
+      loadHeatRanking();
+
+      // 导航点击切换页面
+      document.querySelectorAll('.nav a[data-page]').forEach(function(a) {
+        a.addEventListener('click', function(e) {
+          e.preventDefault();
+          var page = this.getAttribute('data-page');
+          var anchor = this.getAttribute('data-anchor');
+          switchPage(page, anchor);
+        });
+      });
+    });
+
+    function switchPage(page, anchor) {
+      document.querySelectorAll('.page-section').forEach(function(s) { s.classList.remove('active'); });
+      document.querySelectorAll('.nav a[data-page]').forEach(function(a) { a.classList.remove('active'); });
+      var section = document.getElementById('page-' + page);
+      if (section) section.classList.add('active');
+      var navLink = document.querySelector('.nav a[data-page="' + page + '"]');
+      if (navLink) navLink.classList.add('active');
+      if (page === 'browse') loadBrowseComps();
+      if (anchor) {
+        setTimeout(function() {
+          var el = document.getElementById(anchor);
+          if (el) el.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+      }
+    }
+
+    // ==================== 认证标签切换 ====================
+    function switchAuthTab(tab) {
+      document.querySelectorAll('.auth-tab').forEach(function(t) { t.classList.remove('active'); });
+      document.querySelectorAll('.login-form, .register-form').forEach(function(f) { f.classList.remove('active'); });
+      if (tab === 'login') {
+        document.querySelector('.auth-tab[onclick*="login"]').classList.add('active');
+        document.getElementById('form-login').classList.add('active');
+      } else {
+        document.querySelector('.auth-tab[onclick*="register"]').classList.add('active');
+        document.getElementById('form-register').classList.add('active');
+      }
+    }
+
+    // ==================== 角色选择 ====================
+    function selectRole(el) {
+      document.querySelectorAll('.role-option').forEach(function(o) { o.classList.remove('active'); });
+      el.classList.add('active');
+    }
+
+    function getSelectedRole() {
+      var active = document.querySelector('.role-option.active');
+      return active ? active.getAttribute('data-role') : 'STUDENT';
+    }
+
+    // ==================== 注册表单提交 ====================
+    document.addEventListener('DOMContentLoaded', function() {
+      var registerForm = document.getElementById('registerForm');
+      if (registerForm) {
+        registerForm.addEventListener('submit', async function(e) {
+          e.preventDefault();
+          var username = document.getElementById('regUsername').value.trim();
+          var password = document.getElementById('regPassword').value.trim();
+          var name = document.getElementById('regName').value.trim();
+          var role = getSelectedRole();
+          var phone = document.getElementById('regPhone').value.trim();
+          var email = document.getElementById('regEmail').value.trim();
+          var errEl = document.getElementById('regError');
+
+          if (!username || !password || !name || !phone) {
+            errEl.textContent = '请填写所有必填字段';
+            errEl.style.display = 'block';
+            return;
+          }
+          if (password.length < 6) {
+            errEl.textContent = '密码至少需要6位';
+            errEl.style.display = 'block';
+            return;
+          }
+
+          var regBtn = document.getElementById('regBtn');
+          var prevText = regBtn.textContent;
+          regBtn.disabled = true;
+          regBtn.textContent = '注册中...';
+          errEl.style.display = 'none';
+
+          try {
+            var result = await AuthAPI.register({
+              username: username,
+              password: password,
+              name: name,
+              role: role,
+              phone: phone,
+              email: email || ''
+            });
+            if (result.success) {
+              alert('注册成功！请登录');
+              switchAuthTab('login');
+              document.getElementById('username').value = username;
+              document.getElementById('regUsername').value = '';
+              document.getElementById('regPassword').value = '';
+              document.getElementById('regName').value = '';
+              document.getElementById('regPhone').value = '';
+              document.getElementById('regEmail').value = '';
+            } else {
+              errEl.textContent = result.message || '注册失败';
+              errEl.style.display = 'block';
+            }
+          } catch (err) {
+            errEl.textContent = '网络错误，请稍后重试';
+            errEl.style.display = 'block';
+          } finally {
+            regBtn.disabled = false;
+            regBtn.textContent = prevText;
+          }
+        });
+      }
+    });
+
+    // ==================== 浏览竞赛 ====================
+    async function loadBrowseComps() {
+      var listEl = document.getElementById('browseCompList');
+      if (!listEl) return;
+      listEl.innerHTML = '<div style="text-align:center;padding:40px;color:#999;grid-column:1/-1;">加载中...</div>';
+      try {
+        var resp = await fetch('/api/competitions');
+        var data = await resp.json();
+        if (data.success && data.data && data.data.content) {
+          allCompsData = data.data.content.filter(function(c) { return c.status !== 'pending'; });
+          renderCompCards(allCompsData);
+          populateTypeFilter(allCompsData);
+        } else {
+          listEl.innerHTML = '<div style="text-align:center;padding:40px;color:#999;grid-column:1/-1;">暂无竞赛数据</div>';
+        }
+      } catch(e) {
+        listEl.innerHTML = '<div style="text-align:center;padding:40px;color:#999;grid-column:1/-1;">加载失败，请检查后端是否启动</div>';
+      }
+    }
+
+    function renderCompCards(comps) {
+      var listEl = document.getElementById('browseCompList');
+      if (!listEl) return;
+      if (!comps || comps.length === 0) {
+        listEl.innerHTML = '<div style="text-align:center;padding:40px;color:#999;grid-column:1/-1;">暂无符合条件的竞赛</div>';
+        return;
+      }
+      var html = comps.map(function(c) {
+        var statusMap = { 'pending':'待审核','preparing':'准备中','enrolling':'报名中','ready':'待开始','active':'进行中','reviewing':'评审中','completed':'已结束' };
+        var statusText = statusMap[c.status] || c.status || '未知';
+        return '<div class="competition-card" onclick="viewCompDetail(' + c.id + ')">' +
+          '<div class="comp-card-header">' +
+            '<h3>' + (c.name || '') + '</h3>' +
+            '<span class="comp-type-tag">' + (c.type || '') + '</span>' +
+          '</div>' +
+          '<div class="comp-info">' +
+            '<span>状态：' + statusText + '</span>' +
+            '<span>已报：' + (c.registered || 0) + '人</span>' +
+            '<span>热度：' + (c.heatValue || 0) + '</span>' +
+          '</div>' +
+        '</div>';
+      }).join('');
+      listEl.innerHTML = html;
+    }
+
+    function populateTypeFilter(comps) {
+      var sel = document.getElementById('browseTypeFilter');
+      if (!sel) return;
+      var types = [...new Set(comps.map(function(c) { return c.type; }).filter(Boolean))];
+      sel.innerHTML = '<option value="">全部类型</option>';
+      types.forEach(function(t) {
+        var opt = document.createElement('option');
+        opt.value = t;
+        opt.textContent = t;
+        sel.appendChild(opt);
+      });
+    }
+
+    function filterBrowseComps() {
+      var keyword = (document.getElementById('browseSearch').value || '').toLowerCase();
+      var type = document.getElementById('browseTypeFilter').value;
+      var filtered = allCompsData.filter(function(c) {
+        var matchName = !keyword || (c.name && c.name.toLowerCase().includes(keyword));
+        var matchType = !type || c.type === type;
+        return matchName && matchType;
+      });
+      renderCompCards(filtered);
+    }
+
+    function viewCompDetail(id) {
+      var c = allCompsData.find(function(x) { return x.id === id; });
+      if (!c) return;
+      var statusMap = { 'pending':'待审核','preparing':'准备中','enrolling':'报名中','ready':'待开始','active':'进行中','reviewing':'评审中','completed':'已结束' };
+      alert('竞赛详情\n\n名称：' + (c.name || '') + '\n类型：' + (c.type || '') + '\n状态：' + (statusMap[c.status] || c.status || '') + '\n已报名：' + (c.registered || 0) + '人\n热度：' + (c.heatValue || 0) + '\n\n请登录后报名参赛。');
+      switchPage('auth');
+    }
+
+    async function loadHeatRanking() {
+      try {
+        var resp = await fetch('/api/competitions/ranking');
+        var data = await resp.json();
+        if (data.success && data.data) {
+          var top5 = data.data.slice(0, 5);
+          var colors = ['#ff6b6b','#ffa502','#ffa502','#7bed9f','#7bed9f'];
+          var html = top5.map(function(c, i) {
+            return '<div style="background:white;border-radius:8px;padding:16px;flex:1;min-width:180px;max-width:200px;box-shadow:0 2px 12px rgba(0,0,0,0.1);text-align:center;border-top:4px solid ' + colors[i] + ';">' +
+              '<div style="font-size:28px;font-weight:bold;color:' + colors[i] + ';margin-bottom:8px;">#' + (i + 1) + '</div>' +
+              '<div style="font-weight:bold;margin-bottom:6px;font-size:13px;">' + (c.name || '') + '</div>' +
+              '<div style="color:#666;font-size:11px;">' + (c.type || '') + '</div>' +
+              '<div style="margin-top:10px;font-size:12px;color:#999;">热度 ' + (c.heatValue || 0) + ' | 已报 ' + (c.registered || 0) + '人</div>' +
+              '</div>';
+          }).join('');
+          document.getElementById('rankingList').innerHTML = html || '<div style="text-align:center;padding:40px;color:#999;">暂无竞赛数据</div>';
+        }
+      } catch(e) {
+        document.getElementById('rankingList').innerHTML = '<div style="text-align:center;padding:40px;color:#999;">排行榜加载中...</div>';
+      }
+    }
+
+    // 加载工作时间设置
+    function loadWorkTimeSettings() {
+      try {
+        const systemSettings = JSON.parse(localStorage.getItem('systemSettings') || '{}');
+        const workTime = systemSettings.workTime || {
+          weekdays: '9:00 - 17:00',
+          weekends: '休息',
+          holidays: '另行通知'
+        };
+
+        document.getElementById('workTimeWeekdays').textContent = `周一至周五：${workTime.weekdays}`;
+        document.getElementById('workTimeWeekends').textContent = `周六至周日：${workTime.weekends}`;
+        document.getElementById('workTimeHolidays').textContent = `节假日：${workTime.holidays}`;
+        Logger.debug('工作时间设置加载完成', workTime);
+      } catch (error) {
+        Logger.error('加载工作时间设置失败', error);
+      }
+    }
+
+    // 密码显示/隐藏功能
+    function togglePassword(inputId) {
+      const input = document.getElementById(inputId);
+      const toggle = input.nextElementSibling;
+      if (input.type === 'password') {
+        input.type = 'text';
+        toggle.textContent = '🙈';
+      } else {
+        input.type = 'password';
+        toggle.textContent = '👁️';
+      }
+    }
+
+
+
+    // 页面加载完成后初始化
+    window.addEventListener('DOMContentLoaded', function () {
+      console.log('✅ DOM加载完成，开始初始化');
+      loadWorkTimeSettings();
+
+      // 绑定登录表单提交事件
+      const loginForm = document.getElementById('loginForm');
+      if (loginForm) {
+        loginForm.addEventListener('submit', async function (e) {
+          e.preventDefault();
+          Logger.info('登录按钮点击', { action: 'LOGIN_ATTEMPT' });
+
+          const username = document.getElementById('username').value;
+          const password = document.getElementById('password').value;
+          const privacyConsent = document.getElementById('privacyConsent').checked;
+
+          Logger.debug('表单数据', { username, password: '******', privacyConsent });
+
+          // 清除之前的错误信息
+          document.getElementById('passwordError').style.display = 'none';
+
+          // 验证表单
+          if (!username || !password) {
+            Logger.warn('登录验证失败', { reason: '用户名或密码为空' });
+            document.getElementById('passwordError').textContent = '用户名或密码不能为空';
+            document.getElementById('passwordError').style.display = 'block';
+            return;
+          }
+
+          if (!privacyConsent) {
+            Logger.warn('登录验证失败', { reason: '未同意隐私政策' });
+            document.getElementById('passwordError').textContent = '请阅读并同意隐私政策';
+            document.getElementById('passwordError').style.display = 'block';
+            return;
+          }
+
+          const loginBtn = document.getElementById('loginBtn');
+          const prevBtnText = loginBtn.textContent;
+          loginBtn.disabled = true;
+          loginBtn.textContent = '登录中...';
+
+          try {
+            Logger.info('登录请求开始', { username });
+            const result = await AuthAPI.login(username, password);
+            Logger.info('后端登录成功', { username, role: result.user?.role });
+
+            if (result.token) {
+              localStorage.setItem('token', result.token);
+              Logger.debug('Token已保存');
+            }
+
+            if (result.user) {
+              const roleMap = { 'ADMIN': 'admin', 'TEACHER': 'teacher', 'STUDENT': 'student' };
+              const userInfo = {
+                username: result.user.username,
+                name: result.user.name,
+                role: roleMap[result.user.role] || result.user.role,
+                college: result.user.college || '',
+                major: result.user.major || '',
+                className: result.user.className || '',
+                phone: result.user.phone || '',
+                email: result.user.email || ''
+              };
+              localStorage.setItem('userInfo', JSON.stringify(userInfo));
+              Logger.info('用户信息已保存', userInfo);
+            }
+
+            const userRole = result.user ?
+              (result.user.role === 'ADMIN' || result.user.role === 'admin' ? 'admin' :
+                result.user.role === 'TEACHER' || result.user.role === 'teacher' ? 'teacher' : 'student') : 'student';
+            Logger.info('登录成功，跳转到', { role: userRole });
+            redirectToRolePage(userRole);
+
+          } catch (error) {
+            Logger.warn('登录失败', { message: error.message });
+            document.getElementById('passwordError').textContent = '登录失败，请检查网络连接后重试';
+            document.getElementById('passwordError').style.display = 'block';
+          } finally {
+            loginBtn.disabled = false;
+            loginBtn.textContent = prevBtnText;
+          }
+        });
+      } else {
+        Logger.error('未找到登录表单');
+      }
+    });
+
+    // 跳转到角色页面
+    function redirectToRolePage(role) {
+      const urls = {
+        admin: 'admin.html',
+        teacher: 'teacher.html',
+        student: 'student.html'
+      };
+      window.location.href = urls[role] || 'student.html';
+    }
+
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,2980 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>教师中心 - 高校竞赛管理系统</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/antd@5.12.8/dist/reset.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Microsoft YaHei', 'PingFang SC', sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            flex-shrink: 0;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .sidebar-header h2 {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 10px;
+        }
+
+        .sidebar-menu a {
+            display: block;
+            padding: 12px 15px;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+
+        .sidebar-menu a:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-menu a.active {
+            background: rgba(255, 255, 255, 0.2);
+            font-weight: 500;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #667eea;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .content-section {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5a6fe4;
+        }
+
+        .btn-outline {
+            background: white;
+            color: #667eea;
+            border: 1px solid #667eea;
+        }
+
+        .btn-outline:hover {
+            background: #f0f0ff;
+        }
+
+        .btn-success {
+            background: #52c41a;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #389e0d;
+        }
+
+        .btn-danger {
+            background: #ff4d4f;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #cf1322;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            border: 1px solid #e8e8e8;
+            border-radius: 8px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+
+        .card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .card h3 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .card p {
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .status {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .status-pending {
+            background: #fff7e6;
+            color: #fa8c16;
+        }
+
+        .status-preparing {
+            background: #f0f5ff;
+            color: #1890ff;
+        }
+
+        .status-enrolling {
+            background: #e6f7ff;
+            color: #1890ff;
+        }
+
+        .status-ready {
+            background: #f6ffed;
+            color: #52c41a;
+        }
+
+        .status-active {
+            background: #f6ffed;
+            color: #52c41a;
+        }
+
+        .status-reviewing {
+            background: #fff1f0;
+            color: #fa8c16;
+        }
+
+        .status-ended {
+            background: #f5f5f5;
+            color: #8c8c8c;
+        }
+
+        .status-rejected {
+            background: #fff1f0;
+            color: #ff4d4f;
+        }
+
+        .page-section {
+            display: none;
+        }
+
+        .page-section.active {
+            display: block;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #e8e8e8;
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .search-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .search-bar input,
+        .search-bar select {
+            padding: 10px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+        }
+
+        .search-bar input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e8e8e8;
+        }
+
+        th {
+            background-color: #f5f5f5;
+            font-weight: 500;
+            color: #333;
+        }
+
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #666;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .message-list {
+            list-style: none;
+        }
+
+        .message-item {
+            padding: 15px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .message-item:hover {
+            background: #f9f9f9;
+        }
+
+        .message-title {
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .message-time {
+            color: #999;
+            font-size: 12px;
+        }
+
+        .message-content {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .setting-group {
+            margin-bottom: 30px;
+        }
+
+        .setting-group h3 {
+            margin-bottom: 15px;
+            color: #333;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e8e8e8;
+        }
+
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .setting-item label {
+            color: #666;
+        }
+
+        .toggle-switch {
+            width: 44px;
+            height: 22px;
+            background: #d9d9d9;
+            border-radius: 11px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .toggle-switch.active {
+            background: #667eea;
+        }
+
+        .toggle-switch::after {
+            content: '';
+            width: 18px;
+            height: 18px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            transition: left 0.3s;
+        }
+
+        .toggle-switch.active::after {
+            left: 24px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>教师中心</h2>
+            </div>
+
+            <ul class="sidebar-menu">
+                <li><a href="#" class="active" data-page="browse">浏览竞赛</a></li>
+                <li><a href="#" data-page="create">创建竞赛</a></li>
+                <li><a href="#" data-page="mycompetitions">我的竞赛</a></li>
+                <li><a href="#" data-page="review">评审管理</a></li>
+                <li><a href="#" data-page="messages">消息通知</a></li>
+                <li><a href="#" data-page="settings">个人信息</a></li>
+                <li><a href="index.html">退出登录</a></li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <header class="header">
+                <h1 id="pageTitle">浏览竞赛</h1>
+
+                <div class="user-info">
+                    <span>教师</span>
+                    <div class="user-avatar">T</div>
+                </div>
+            </header>
+
+            <div id="page-browse" class="page-section active">
+                <div class="content-section">
+                    <h2 class="section-title">浏览竞赛</h2>
+
+                    <div class="search-bar">
+                        <input type="text" id="browseSearch" placeholder="搜索竞赛名称">
+                        <select id="browseType">
+                            <option value="">全部类型</option>
+                            <option value="创新创业类">创新创业类</option>
+                            <option value="科技竞赛类">科技竞赛类</option>
+                            <option value="文体竞赛类">文体竞赛类</option>
+                        </select>
+                        <select id="browseStatus">
+                            <option value="">全部状态</option>
+                            <option value="enrolling">报名中</option>
+                            <option value="active">进行中</option>
+                            <option value="reviewing">评审中</option>
+                            <option value="ended">已结束</option>
+                            <option value="pending">待审核</option>
+                            <option value="preparing">筹备中</option>
+                        </select>
+                        <button class="btn btn-primary" onclick="searchBrowseCompetitions()">搜索</button>
+                        <button class="btn btn-outline" onclick="resetBrowseSearch()">重置</button>
+                    </div>
+
+                    <div class="card-grid" id="browseCompetitions">
+                        <div style="text-align: center; padding: 40px; color: #999;">加载中...</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="page-create" class="page-section">
+                <div class="content-section">
+                    <h2 class="section-title">创建竞赛</h2>
+
+                    <form id="createForm">
+                        <div class="form-group">
+                            <label>竞赛名称</label>
+                            <input type="text" id="competitionName" placeholder="请输入竞赛名称">
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <div class="form-group">
+                                <label>竞赛类型</label>
+                                <select id="competitionType">
+                                    <option>请选择竞赛类型</option>
+                                    <option>创新创业</option>
+                                    <option>程序设计</option>
+                                    <option>数学建模</option>
+                                    <option>英语演讲</option>
+                                    <option>人工智能</option>
+                                    <option>其他</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>竞赛赛制</label>
+                                <select id="competitionFormat">
+                                    <option>请选择赛制</option>
+                                    <option value="team">团队赛</option>
+                                    <option value="individual">个人赛</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>报名开始时间</label>
+                                <input type="datetime-local">
+                            </div>
+
+                            <div class="form-group">
+                                <label>报名截止时间</label>
+                                <input type="datetime-local" id="registerDeadline">
+                            </div>
+
+                            <div class="form-group">
+                                <label>竞赛开始时间</label>
+                                <input type="datetime-local" id="startTime">
+                            </div>
+
+                            <div class="form-group">
+                                <label>竞赛结束时间</label>
+                                <input type="datetime-local" id="endTime">
+                            </div>
+
+                            <div class="form-group">
+                                <label>最大报名人数</label>
+                                <input type="number" placeholder="请输入最大人数" value="100">
+                            </div>
+
+                            <div class="form-group" id="teamSizeGroup">
+                                <label>团队最大人数</label>
+                                <input type="number" id="maxTeamSize" placeholder="请输入团队最大人数" value="5">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>竞赛描述</label>
+                            <textarea id="description" placeholder="请输入竞赛的详细描述信息"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>竞赛规则</label>
+                            <textarea placeholder="请输入竞赛规则"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>评审教师</label>
+                            <div style="margin-top: 15px;">
+                                <div class="reviewer-grid" id="reviewerGrid">
+                                    <!-- 动态加载评审教师 -->
+                                </div>
+                            </div>
+                            <p style="margin-top: 15px; font-size: 12px; color: #666;">请选择至少一位评审教师</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label style="display:flex;align-items:center;gap:8px;">
+                                <span>是否要求学生上传作品</span>
+                                <button type="button" id="uploadWorksToggle" onclick="this.classList.toggle('active'); this.textContent = this.classList.contains('active') ? '是' : '否';" style="padding:6px 16px;border:1px solid #d9d9d9;border-radius:4px;background:white;cursor:pointer;">否</button>
+                                <span style="color:#888;font-size:12px;">开启后将启用评审功能</span>
+                            </label>
+                        </div>
+
+                        <div style="display:flex;gap:10px;">
+                            <button type="button" class="btn btn-outline" onclick="saveAsDraft()">保存草稿</button>
+                            <button type="button" class="btn btn-primary" onclick="submitForReview()">提交审核</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div id="page-mycompetitions" class="page-section">
+                <div class="content-section">
+                    <h2 class="section-title">我的竞赛</h2>
+
+                    <button class="btn btn-outline" onclick="exportRegistrations()" style="margin-bottom:10px;">导出报名名单</button>
+                    <div class="search-bar">
+                        <input type="text" id="searchName" placeholder="搜索竞赛名称">
+                        <select id="searchStatus">
+                            <option value="">全部状态</option>
+                            <option value="pending">审核中</option>
+                            <option value="preparing">准备中</option>
+                            <option value="enrolling">报名中</option>
+                            <option value="ready">待开始</option>
+                            <option value="active">进行中</option>
+                            <option value="reviewing">评审中</option>
+                            <option value="ended">已结束</option>
+                            <option value="rejected">已拒绝</option>
+                        </select>
+                        <button class="btn btn-primary" onclick="searchCompetitions()">搜索</button>
+                        <button class="btn btn-outline" onclick="resetSearch()">重置</button>
+                    </div>
+
+                    <table id="myCompetitionsTable">
+                        <thead>
+                            <tr>
+                                <th>竞赛名称</th>
+                                <th>类型</th>
+                                <th>报名人数</th>
+                                <th>报名开始</th>
+                                <th>报名截止</th>
+                                <th>竞赛开始</th>
+                                <th>竞赛结束</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="myCompetitionsBody">
+                            <tr>
+                                <td colspan="9" style="text-align: center; padding: 40px; color: #999;">加载中...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="page-review" class="page-section">
+                <div class="content-section" style="margin-bottom:20px;">
+                    <h3>分配评审教师</h3>
+                    <div class="form-group"><select id="assignCompetition" onchange="loadRegistrationsForAssign()" style="width:100%;padding:8px;"><option value="">请选择竞赛</option></select></div>
+                    <div style="display:flex;gap:10px;">
+                        <button class="btn btn-outline" onclick="autoAssignReviewers()">随机分配评审</button>
+                        <button class="btn btn-outline" onclick="showManualAssign()">手动指定评审</button>
+                    </div>
+                    <div id="registrationsForAssign" style="margin-top:12px;"></div>
+                </div>
+                <div class="content-section">
+                    <h2 class="section-title">评审管理</h2>
+
+                    <div class="search-bar">
+                        <input type="text" id="reviewSearchName" placeholder="搜索竞赛名称">
+                        <button class="btn btn-primary" onclick="searchReviews()">搜索</button>
+                        <button class="btn btn-outline" onclick="resetReviewSearch()">重置</button>
+                    </div>
+
+                    <div id="reviewEmptyResultMsg"
+                        style="text-align: center; padding: 40px; color: #999; display: none;">
+                        没有找到符合条件的竞赛
+                    </div>
+
+                    <table id="reviewTable">
+                        <thead>
+                            <tr>
+                                <th>竞赛名称</th>
+                                <th>待评审作品</th>
+                                <th>已评审作品</th>
+                                <th>截止时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reviewBody">
+                            <tr>
+                                <td colspan="5" style="text-align: center; padding: 40px; color: #999;">加载中...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="page-messages" class="page-section">
+                <div class="content-section" style="margin-bottom:20px;">
+                    <h3>评审任务通知</h3>
+                    <div id="reviewNotifications"><div style="text-align:center;padding:20px;color:#999;">加载中...</div></div>
+                </div>
+                <div class="content-section">
+                    <h2 class="section-title">发送消息</h2>
+
+                    <div style="background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                        <div class="form-group" id="competitionSelectGroup">
+                            <label>选择竞赛</label>
+                            <select id="messageCompetition" onchange="onCompetitionSelected()"
+                                style="width: 100%; padding: 10px; border: 1px solid #d9d9d9; border-radius: 4px;">
+                                <option value="">请选择竞赛</option>
+                            </select>
+                        </div>
+
+                        <div id="studentSelectArea" style="display: none;">
+                            <div class="form-group">
+                                <label>选择发送对象</label>
+                                <select id="messageRecipientType" onchange="toggleStudentSelect()"
+                                    style="width: 100%; padding: 10px; border: 1px solid #d9d9d9; border-radius: 4px;">
+                                    <option value="all">所有参赛学生</option>
+                                    <option value="specific">指定学生</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group" id="specificStudentSelect" style="display: none;">
+                                <label>选择学生</label>
+                                <select id="messageRecipient"
+                                    style="width: 100%; padding: 10px; border: 1px solid #d9d9d9; border-radius: 4px;">
+                                    <option value="">请选择学生</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>消息内容</label>
+                                <textarea id="messageContent" placeholder="请输入要发送的消息内容"
+                                    style="width: 100%; padding: 10px; border: 1px solid #d9d9d9; border-radius: 4px; min-height: 80px;"></textarea>
+                            </div>
+
+                            <div style="text-align: right;">
+                                <button class="btn btn-primary" onclick="sendMessage()">发送消息</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h2 class="section-title">消息通知</h2>
+
+                    <div id="messageEmptyTip" style="text-align: center; padding: 40px; color: #999;">
+                        暂无消息通知
+                    </div>
+
+                    <ul class="message-list" id="messageList" style="display: none;">
+                    </ul>
+                </div>
+            </div>
+
+            <div id="page-settings" class="page-section">
+                <div class="content-section">
+                    <h2 class="section-title">个人信息</h2>
+
+                    <div style="text-align:center;margin-bottom:20px;">
+                        <img id="settingsAvatar" src="" style="width:80px;height:80px;border-radius:50%;object-fit:cover;background:#667eea;display:none;" onerror="this.style.display='none'">
+                        <div style="margin-top:8px;">
+                            <input type="file" id="avatarFileInput" accept="image/*" style="display:none;" onchange="uploadAvatar()">
+                            <button class="btn btn-outline" onclick="document.getElementById('avatarFileInput').click()">上传头像</button>
+                            <div style="margin-top:6px;font-size:12px;color:#999;">支持 JPG/PNG/GIF 格式，大小不超过 2MB</div>
+                        </div>
+                    </div>
+
+                    <div class="setting-group">
+                        <h3>基本信息</h3>
+                        <div class="form-group">
+                            <label>工号</label>
+                            <input type="text" id="settingsUsername" disabled style="background:#f5f5f5;">
+                        </div>
+                        <div class="form-group">
+                            <label>姓名</label>
+                            <input type="text" id="settingsName">
+                        </div>
+                        <div class="form-group">
+                            <label>所属学院</label>
+                            <input type="text" id="settingsCollege">
+                        </div>
+                        <div class="form-group">
+                            <label>联系电话</label>
+                            <input type="text" id="settingsPhone">
+                        </div>
+                        <div class="form-group">
+                            <label>邮箱</label>
+                            <input type="email" id="settingsEmail">
+                        </div>
+                    </div>
+
+                    <div class="setting-group">
+                        <h3>通知偏好</h3>
+                        <div class="setting-item">
+                            <label>竞赛审核结果通知</label>
+                            <div class="toggle-switch active" onclick="toggleSwitch(this)"></div>
+                        </div>
+                        <div class="setting-item">
+                            <label>新报名提醒</label>
+                            <div class="toggle-switch active" onclick="toggleSwitch(this)"></div>
+                        </div>
+                        <div class="setting-item">
+                            <label>评审截止提醒</label>
+                            <div class="toggle-switch active" onclick="toggleSwitch(this)"></div>
+                        </div>
+                        <div class="setting-item">
+                            <label>系统维护通知</label>
+                            <div class="toggle-switch active" onclick="toggleSwitch(this)"></div>
+                        </div>
+                    </div>
+
+                    <div class="setting-group">
+                        <h3>修改密码</h3>
+                        <div class="form-group">
+                            <label>原密码</label>
+                            <input type="password" placeholder="请输入原密码">
+                        </div>
+                        <div class="form-group">
+                            <label>新密码</label>
+                            <input type="password" placeholder="请输入新密码">
+                        </div>
+                        <div class="form-group">
+                            <label>确认新密码</label>
+                            <input type="password" placeholder="请确认新密码">
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn btn-primary" style="padding: 10px 30px;"
+                            onclick="saveSettings()">保存修改</button>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        // 切换开关函数
+        function toggleSwitch(toggle) {
+            console.log('toggleSwitch called with:', toggle);
+            toggle.classList.toggle('active');
+            console.log('After toggle, classList:', toggle.classList);
+        }
+
+        function updateHeaderUser(userInfo) {
+            var userNameSpan = document.querySelector('.header .user-info span');
+            var userAvatarDiv = document.querySelector('.header .user-info .user-avatar');
+            if (userNameSpan) userNameSpan.textContent = userInfo.name || userInfo.username || '';
+            if (userAvatarDiv) {
+                if (userInfo.avatar) {
+                    userAvatarDiv.innerHTML = '<img src="' + userInfo.avatar + '" style="width:40px;height:40px;border-radius:50%;object-fit:cover;" onerror="this.innerHTML=\'\';this.textContent=\'' + (userInfo.name || 'U').charAt(0) + '\'">';
+                } else {
+                    userAvatarDiv.textContent = (userInfo.name || 'U').charAt(0);
+                }
+            }
+        }
+
+        // 从localStorage获取用户信息并更新页面显示
+        try {
+            var _userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
+            if (_userInfo.name || _userInfo.username) {
+                updateHeaderUser(_userInfo);
+            }
+        } catch (error) {
+            console.error('读取用户信息失败:', error);
+        }
+
+        // 更新统计数据
+        // 监听赛制选择变化，控制团队人数字段的显示/隐藏
+        document.addEventListener('DOMContentLoaded', function () {
+            const formatSelect = document.getElementById('competitionFormat');
+            const teamSizeGroup = document.getElementById('teamSizeGroup');
+
+            if (formatSelect && teamSizeGroup) {
+                // 初始状态
+                if (formatSelect.value === 'individual') {
+                    teamSizeGroup.style.display = 'none';
+                }
+
+                // 监听变化
+                formatSelect.addEventListener('change', function () {
+                    if (this.value === 'individual') {
+                        teamSizeGroup.style.display = 'none';
+                    } else {
+                        teamSizeGroup.style.display = 'block';
+                    }
+                });
+            }
+
+            // 加载评审教师列表
+            loadReviewers();
+        });
+
+        // 加载评审教师列表
+        function loadReviewers() {
+            generateReviewerList();
+        }
+
+        // 自动更新竞赛状态
+        // 定时刷新统计数据（不再操作localStorage）
+        function updateCompetitionStatuses() {
+            if (document.getElementById('page-mycompetitions').classList.contains('active')) {
+                loadMyCompetitions();
+            }
+        }
+
+        // 每30秒检查一次
+        setInterval(updateCompetitionStatuses, 30000);
+
+        const pageTitles = {
+            browse: '浏览竞赛',
+            create: '创建竞赛',
+            mycompetitions: '我的竞赛',
+            review: '评审管理',
+            messages: '消息通知',
+            settings: '个人信息'
+        };
+
+        function switchPage(page, filter = 'all') {
+            document.querySelectorAll('.page-section').forEach(section => {
+                section.classList.remove('active');
+            });
+
+            const targetPage = document.getElementById('page-' + page);
+            if (targetPage) {
+                targetPage.classList.add('active');
+            }
+
+            document.querySelectorAll('.sidebar-menu a[data-page]').forEach(item => {
+                item.classList.remove('active');
+                if (item.dataset.page === page) {
+                    item.classList.add('active');
+                }
+            });
+
+            document.getElementById('pageTitle').textContent = pageTitles[page] || page;
+
+            // 切换到浏览竞赛时加载数据
+            if (page === 'browse') {
+                loadBrowseCompetitions();
+            } else if (page === 'mycompetitions') {
+                const searchName = document.getElementById('searchName');
+                const searchStatus = document.getElementById('searchStatus');
+
+                // 重置搜索框
+                if (searchName) searchName.value = '';
+
+                // 根据筛选条件设置状态选择器
+                if (searchStatus) {
+                    if (filter === 'pending' || filter === 'active' || filter === 'ended' || filter === 'rejected') {
+                        searchStatus.value = filter;
+                    } else {
+                        searchStatus.value = '';
+                    }
+                }
+
+                // 加载我的竞赛数据
+                loadMyCompetitions();
+            } else if (page === 'review') {
+                // 切换到评审管理页面时更新评审管理表格
+                updateReviewManagement();
+                loadReviewAssignCompetitions();
+            } else if (page === 'create') {
+                generateReviewerList();
+                loadDrafts();
+            } else if (page === 'messages') {
+                // 切换到消息页面时加载消息和竞赛列表
+                loadMessages();
+                loadMyCompetitionsForMessage();
+                loadReviewNotifications();
+            } else if (page === 'settings') {
+                // 切换到个人设置页面时加载用户信息
+                loadUserSettings();
+            }
+        }
+
+        document.querySelectorAll('.sidebar-menu a[data-page]').forEach(item => {
+            item.addEventListener('click', function (e) {
+                e.preventDefault();
+                switchPage(this.dataset.page);
+            });
+        });
+
+        // 向评审教师发送通知（通过API）
+        function sendReviewerNotifications(competition) {
+            try {
+                if (!competition.reviewers) return;
+                var reviewerNames = competition.reviewers.split(',').map(function(s) { return s.trim(); }).filter(function(s) { return s; });
+                if (reviewerNames.length === 0) return;
+
+                // 获取教师列表以查找用户ID
+                fetch('/api/auth/teachers', {
+                    headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+                })
+                .then(function(r) { return r.json(); })
+                .then(function(teachersResult) {
+                    var teachers = teachersResult.data || teachersResult || [];
+                    if (!Array.isArray(teachers)) teachers = [];
+                    var reviewerIds = [];
+                    reviewerNames.forEach(function(name) {
+                        var found = teachers.find(function(t) { return t.name === name || t.username === name; });
+                        if (found) reviewerIds.push(found.id);
+                    });
+                    if (reviewerIds.length === 0) { console.log('未找到匹配的评审教师'); return; }
+
+                    // 调用批量发送API
+                    fetch('/api/messages/batch-send', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer ' + localStorage.getItem('token')
+                        },
+                        body: JSON.stringify({
+                            userIds: reviewerIds,
+                            content: '您被邀请评审竞赛 "' + competition.name + '"，请前往评审管理页面查看。'
+                        })
+                    }).then(function(r) { return r.json(); }).then(function(result) {
+                        if (result.success) {
+                            console.log('评审通知发送成功: ' + result.message);
+                        } else {
+                            console.error('发送评审通知失败:', result.message);
+                        }
+                    });
+                }).catch(function(error) {
+                    console.error('发送评审通知失败:', error);
+                });
+            } catch (error) {
+                console.error('发送评审通知失败:', error);
+            }
+        }
+
+        // 向管理员发送审核通知
+        function sendAdminReviewNotification(competition) {
+            fetch('/api/messages/send-to-admin', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('token')
+                },
+                body: JSON.stringify({
+                    competitionId: competition.id || competition.name,
+                    competitionName: competition.name
+                })
+            })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success) {
+                        console.log('管理员审核通知发送成功');
+                    } else {
+                        console.error('发送审核通知失败:', result.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('发送管理员审核通知失败:', error);
+                });
+        }
+
+
+        // 添加模态框样式
+        const style = document.createElement('style');
+        style.textContent = `
+            .modal {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0,0,0,0.5);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 1000;
+            }
+            .modal-content {
+                background-color: white;
+                padding: 20px;
+                border-radius: 8px;
+                width: 90%;
+                max-width: 500px;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            }
+            .modal-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 20px;
+                padding-bottom: 10px;
+                border-bottom: 1px solid #eee;
+            }
+            .modal-body {
+                margin-bottom: 20px;
+            }
+            .modal-footer {
+            text-align: right;
+        }
+
+        /* 评审教师网格布局 */
+        .reviewer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .reviewer-card {
+            background-color: #ffffff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .reviewer-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .reviewer-card input[type="checkbox"] {
+            display: none;
+        }
+
+        .reviewer-label {
+            display: block;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .reviewer-card input[type="checkbox"]:checked + .reviewer-label {
+            background-color: #667eea;
+            border-left: 4px solid #4a5ed0;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+            color: white;
+        }
+
+        .reviewer-card input[type="checkbox"]:checked + .reviewer-label .reviewer-name,
+        .reviewer-card input[type="checkbox"]:checked + .reviewer-label .reviewer-department {
+            color: white;
+        }
+
+        .reviewer-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .reviewer-name {
+            font-weight: 500;
+            font-size: 16px;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .reviewer-department {
+            font-size: 14px;
+            color: #666;
+        }
+        `;
+        document.head.appendChild(style);
+
+        // 加载我的竞赛数据
+        function loadMyCompetitions() {
+            const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
+            const tbody = document.getElementById('myCompetitionsBody');
+            if (!tbody) return;
+
+            tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 40px; color: #999;">加载中...</td></tr>';
+
+            fetch('/api/competitions/my', {
+                method: 'GET',
+                headers: {
+                    'Authorization': 'Bearer ' + localStorage.getItem('token')
+                }
+            })
+                .then(response => response.json())
+                .then(result => {
+                    if (!result.success || !result.data || result.data.length === 0) {
+                        tbody.innerHTML = `
+                        <tr>
+                            <td colspan="9" style="text-align: center; padding: 40px; color: #999;">
+                                您还没有创建任何竞赛
+                            </td>
+                        </tr>
+                    `;
+                        return;
+                    }
+
+                    tbody.innerHTML = '';
+                    result.data.forEach((competition) => {
+                        const statusText = getStatusText(competition.status);
+                        const statusClass = getStatusClass(competition.status);
+
+                        const row = document.createElement('tr');
+                        row.dataset.name = competition.name.toLowerCase();
+                        row.dataset.status = competition.status || 'pending';
+                        row.innerHTML = `
+                        <td>${competition.name}</td>
+                        <td>${competition.type || '未知'}</td>
+                        <td>${competition.registered || 0}/${competition.maxTeamSize || 0}</td>
+                        <td>${competition.registrationStartTime || '未设置'}</td>
+                        <td>${formatDate(competition.registerDeadline) || '未设置'}</td>
+                        <td>${formatDate(competition.startTime) || '未设置'}</td>
+                        <td>${formatDate(competition.endTime) || '未设置'}</td>
+                        <td><span class="status ${statusClass}">${statusText}</span></td>
+                        <td>
+                            <button class="btn btn-outline" onclick="viewMyCompetitionDetails('${competition.id}')" style="padding:4px 8px;font-size:12px;">查看</button>
+                            <button class="btn btn-outline" onclick="editCompetition(${competition.id})" style="padding:4px 8px;font-size:12px;">编辑</button>
+                            ${['pending','preparing','draft','rejected','ended'].includes(competition.status) ? '<button class="btn btn-outline" onclick="deleteCompetition(' + competition.id + ')" style="padding:4px 8px;font-size:12px;color:#e74c3c;">删除</button>' : ''}
+                        </td>
+                    `;
+                        tbody.appendChild(row);
+                    });
+
+                    console.log('已加载', result.data.length, '个竞赛');
+                })
+                .catch(error => {
+                    console.error('加载我的竞赛失败:', error);
+                    tbody.innerHTML = `
+                    <tr>
+                        <td colspan="9" style="text-align: center; padding: 40px; color: #999;">
+                            加载失败，请刷新页面
+                        </td>
+                    </tr>
+                `;
+                });
+        }
+
+        // 编辑竞赛
+        async function editCompetition(id) {
+            try {
+                var resp = await fetch('/api/competitions/' + id, {
+                    headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('token') || '') }
+                }).then(r => r.json());
+                if (!resp.success || !resp.data) { alert('获取竞赛信息失败'); return; }
+                var c = resp.data;
+
+                var modal = document.createElement('div');
+                modal.className = 'modal';
+                var modalId = 'edit_comp_' + Date.now();
+                modal.id = modalId;
+                modal.innerHTML =
+                    '<div class="modal-content" style="max-width:600px;max-height:80vh;overflow-y:auto;">' +
+                        '<div class="modal-header">' +
+                            '<h3>编辑竞赛</h3>' +
+                            '<button onclick="document.getElementById(\'' + modalId + '\').remove();" style="background:none;border:none;font-size:24px;cursor:pointer;">&times;</button>' +
+                        '</div>' +
+                        '<div class="modal-body">' +
+                            '<div class="form-group"><label>竞赛名称</label><input type="text" id="editCompName" value="' + escapeHtml(c.name || '') + '"></div>' +
+                            '<div class="form-group"><label>类型</label><select id="editCompType"><option value="科技竞赛类"' + (c.type === '科技竞赛类' ? ' selected' : '') + '>科技竞赛类</option><option value="创新创业类"' + (c.type === '创新创业类' ? ' selected' : '') + '>创新创业类</option><option value="文体竞赛类"' + (c.type === '文体竞赛类' ? ' selected' : '') + '>文体竞赛类</option></select></div>' +
+                            '<div class="form-group"><label>描述</label><textarea id="editCompDesc" style="width:100%;min-height:80px;">' + escapeHtml(c.description || '') + '</textarea></div>' +
+                            '<div class="form-group"><label>开始时间</label><input type="datetime-local" id="editCompStart" value="' + (c.startTime ? c.startTime.substring(0, 16) : '') + '"></div>' +
+                            '<div class="form-group"><label>结束时间</label><input type="datetime-local" id="editCompEnd" value="' + (c.endTime ? c.endTime.substring(0, 16) : '') + '"></div>' +
+                            '<div class="form-group"><label>报名截止</label><input type="datetime-local" id="editCompDeadline" value="' + (c.registerDeadline ? c.registerDeadline.substring(0, 16) : '') + '"></div>' +
+                            '<div class="form-group"><label>最大团队人数</label><input type="number" id="editCompMaxTeam" value="' + (c.maxTeamSize || 1) + '" min="1"></div>' +
+                            '<div class="form-group"><label>评审教师</label><input type="text" id="editCompReviewers" value="' + escapeHtml(c.reviewers || '') + '" placeholder="多个用逗号分隔"></div>' +
+                        '</div>' +
+                        '<div class="modal-footer">' +
+                            '<button class="btn btn-outline" onclick="document.getElementById(\'' + modalId + '\').remove();">取消</button>' +
+                            '<button class="btn btn-primary" onclick="saveCompetitionEdit(' + id + ',\'' + modalId + '\')">保存修改</button>' +
+                        '</div>' +
+                    '</div>';
+                document.body.appendChild(modal);
+                modal.style.display = 'flex';
+                modal.onclick = function(e) { if (e.target === modal) modal.remove(); };
+            } catch(e) { console.error('编辑竞赛失败:', e); }
+        }
+
+        // 保存竞赛编辑
+        async function saveCompetitionEdit(id, modalId) {
+            var body = {
+                id: id,
+                name: document.getElementById('editCompName').value.trim(),
+                type: document.getElementById('editCompType').value,
+                description: document.getElementById('editCompDesc').value.trim(),
+                startTime: document.getElementById('editCompStart').value,
+                endTime: document.getElementById('editCompEnd').value,
+                registerDeadline: document.getElementById('editCompDeadline').value,
+                maxTeamSize: parseInt(document.getElementById('editCompMaxTeam').value) || 1,
+                reviewers: document.getElementById('editCompReviewers').value.trim()
+            };
+            if (!body.name) { alert('请输入竞赛名称'); return; }
+            try {
+                var resp = await fetch('/api/competitions/' + id, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (localStorage.getItem('token') || '') },
+                    body: JSON.stringify(body)
+                }).then(r => r.json());
+                alert(resp.message || (resp.success ? '修改成功' : '修改失败'));
+                if (resp.success) {
+                    document.getElementById(modalId).remove();
+                    loadMyCompetitions();
+                }
+            } catch(e) { console.error('保存编辑失败:', e); }
+        }
+
+        // 删除竞赛
+        async function deleteCompetition(id) {
+            if (!confirm('确定要删除该竞赛吗？此操作不可撤销。')) return;
+            try {
+                var resp = await fetch('/api/competitions/' + id, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('token') || '') }
+                }).then(r => r.json());
+                alert(resp.message || (resp.success ? '删除成功' : '删除失败'));
+                if (resp.success) loadMyCompetitions();
+            } catch(e) { console.error('删除竞赛失败:', e); }
+        }
+
+        // 获取状态文本
+        function getStatusText(status) {
+            switch (status) {
+                case 'pending': return '审核中';
+                case 'preparing': return '准备中';
+                case 'enrolling': return '报名中';
+                case 'ready': return '待开始';
+                case 'active': return '进行中';
+                case 'reviewing': return '评审中';
+                case 'rejected': return '已拒绝';
+                case 'approved': return '已通过';
+                case 'ended': return '已结束';
+                default: return '审核中';
+            }
+        }
+
+        // 获取状态样式类
+        function getStatusClass(status) {
+            switch (status) {
+                case 'pending': return 'status-pending';
+                case 'preparing': return 'status-preparing';
+                case 'enrolling': return 'status-enrolling';
+                case 'ready': return 'status-ready';
+                case 'active': return 'status-active';
+                case 'reviewing': return 'status-reviewing';
+                case 'rejected': return 'status-rejected';
+                case 'approved': return 'status-active';
+                case 'ended': return 'status-ended';
+                default: return 'status-pending';
+            }
+        }
+
+        // 查看我的竞赛详情
+        async function viewMyCompetitionDetails(competitionId) {
+            try {
+                var resp = await fetch('/api/competitions/' + competitionId, {
+                    headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('token') || '') }
+                });
+                var result = await resp.json();
+                if (!result.success || !result.data) {
+                    alert('获取竞赛详情失败'); return;
+                }
+                var competition = result.data;
+
+                const modal = document.createElement('div');
+                modal.style.cssText = `
+                    position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.5);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 10000;
+            `;
+
+                const modalId = 'my_competition_detail_' + Date.now();
+                modal.id = modalId;
+
+                const modalContent = document.createElement('div');
+                modalContent.style.cssText = `
+                background: white;
+                padding: 30px;
+                border-radius: 8px;
+                width: 90%;
+                max-width: 500px;
+                max-height: 80vh;
+                overflow-y: auto;
+            `;
+
+                const statusText = getStatusText(competition.status);
+                const statusClass = getStatusClass(competition.status);
+
+                modalContent.innerHTML =
+                '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">' +
+                    '<h3 style="margin:0;">竞赛详情</h3>' +
+                    '<button onclick="document.getElementById(\'' + modalId + '\').remove();" style="background:none;border:none;font-size:24px;cursor:pointer;">&times;</button>' +
+                '</div>' +
+                '<div style="line-height:1.6;">' +
+                    '<p><strong>竞赛名称：</strong>' + escapeHtml(competition.name) + '</p>' +
+                    '<p><strong>竞赛类型：</strong>' + escapeHtml(competition.type || '未知') + '</p>' +
+                    '<p><strong>报名人数：</strong>' + (competition.registered || 0) + '</p>' +
+                    '<p><strong>报名截止：</strong>' + formatDate(competition.registerDeadline) + '</p>' +
+                    '<p><strong>竞赛开始：</strong>' + formatDate(competition.startTime) + '</p>' +
+                    '<p><strong>竞赛结束：</strong>' + formatDate(competition.endTime) + '</p>' +
+                    '<p><strong>审核状态：</strong><span class="status ' + statusClass + '">' + statusText + '</span></p>' +
+                    '<p><strong>创建时间：</strong>' + formatDate(competition.createTime) + '</p>' +
+                    '<p style="margin-top:20px;"><strong>竞赛描述：</strong></p>' +
+                    '<p style="white-space:pre-wrap;background:#f5f5f5;padding:15px;border-radius:4px;">' + escapeHtml(competition.description || '无') + '</p>' +
+                '</div>';
+
+                modal.onclick = function (e) {
+                    if (e.target === modal) {
+                        document.body.removeChild(modal);
+                    }
+                };
+
+                modal.appendChild(modalContent);
+                document.body.appendChild(modal);
+            } catch (error) {
+                console.error('查看竞赛详情失败:', error);
+                alert('查看竞赛详情失败，请重试');
+            }
+        }
+
+        // 搜索竞赛功能
+        function searchCompetitions() {
+            try {
+                const searchName = document.getElementById('searchName').value.toLowerCase();
+                const searchStatus = document.getElementById('searchStatus').value;
+
+                const competitionRows = document.querySelectorAll('#myCompetitionsBody tr');
+                let hasResults = false;
+
+                competitionRows.forEach(row => {
+                    if (row.id === 'emptySearchResult') return; // 跳过无结果提示行
+
+                    const name = row.dataset.name || '';
+                    const status = row.dataset.status || '';
+
+                    const nameMatch = !searchName || name.includes(searchName);
+                    const statusMatch = !searchStatus || status === searchStatus;
+
+                    if (nameMatch && statusMatch) {
+                        row.style.display = '';
+                        hasResults = true;
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+
+                // 移除旧的提示
+                const oldEmptyMsg = document.getElementById('emptySearchResult');
+                if (oldEmptyMsg) {
+                    oldEmptyMsg.remove();
+                }
+
+                // 如果没有结果，添加提示
+                if (!hasResults) {
+                    const emptyMsg = document.createElement('tr');
+                    emptyMsg.id = 'emptySearchResult';
+                    emptyMsg.innerHTML = `
+                        <td colspan="9" style="text-align: center; padding: 40px; color: #999;">
+                            没有找到符合条件的竞赛
+                        </td>
+                    `;
+                    document.getElementById('myCompetitionsBody').appendChild(emptyMsg);
+                }
+            } catch (error) {
+                console.error('搜索竞赛失败:', error);
+            }
+        }
+
+        // 重置搜索功能
+        function resetSearch() {
+            try {
+                document.getElementById('searchName').value = '';
+                document.getElementById('searchStatus').value = '';
+
+                // 重新加载竞赛数据
+                loadMyCompetitions();
+            } catch (error) {
+                console.error('重置搜索失败:', error);
+            }
+        }
+
+        // 移除实时搜索功能，只保留点击搜索按钮的功能
+        // 这样用户必须点击搜索按钮才能开始搜索
+
+        // 查看竞赛详情 — 从API获取数据
+        async function viewCompetition(id) {
+            try {
+                const resp = await fetch('/api/competitions/' + id, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + (localStorage.getItem('token') || '')
+                    }
+                });
+                if (!resp.ok) throw new Error('请求失败');
+                const result = await resp.json();
+                if (!result.success || !result.data) { alert('获取竞赛详情失败'); return; }
+                const c = result.data;
+
+                let statusText = c.status || '-';
+                const statusMap = { pending: '待审核', preparing: '筹备中', enrolling: '报名中', active: '进行中', reviewing: '评审中', ended: '已结束' };
+                if (statusMap[c.status]) statusText = statusMap[c.status];
+
+                const viewModal = document.createElement('div');
+                viewModal.className = 'modal';
+                viewModal.innerHTML =
+                    '<div class="modal-content">' +
+                        '<div class="modal-header">' +
+                            '<h3>竞赛详情 - ' + escapeHtml(c.name) + '</h3>' +
+                            '<button onclick="this.closest(\'.modal\').remove()" style="background:none;border:none;font-size:20px;cursor:pointer;">×</button>' +
+                        '</div>' +
+                        '<div class="modal-body">' +
+                            '<div style="margin-bottom:15px;"><strong>竞赛名称：</strong>' + escapeHtml(c.name || '-') + '</div>' +
+                            '<div style="margin-bottom:15px;"><strong>竞赛类型：</strong>' + escapeHtml(c.type || '-') + '</div>' +
+                            '<div style="margin-bottom:15px;"><strong>报名人数：</strong>' + (c.registered || 0) + '</div>' +
+                            '<div style="margin-bottom:15px;"><strong>报名截止：</strong>' + formatDate(c.registerDeadline) + '</div>' +
+                            '<div style="margin-bottom:15px;"><strong>竞赛开始：</strong>' + formatDate(c.startTime) + '</div>' +
+                            '<div style="margin-bottom:15px;"><strong>竞赛结束：</strong>' + formatDate(c.endTime) + '</div>' +
+                            '<div style="margin-bottom:15px;"><strong>状态：</strong>' + statusText + '</div>' +
+                            '<div style="margin-bottom:15px;"><strong>竞赛描述：</strong>' + escapeHtml(c.description || '-') + '</div>' +
+                        '</div>' +
+                        '<div class="modal-footer">' +
+                            '<button class="btn btn-primary" onclick="this.closest(\'.modal\').remove()">确定</button>' +
+                        '</div>' +
+                    '</div>';
+                document.body.appendChild(viewModal);
+                viewModal.style.display = 'flex';
+            } catch(e) {
+                console.error('查看竞赛详情失败:', e);
+                alert('查看竞赛详情失败，请重试');
+            }
+        }
+
+        // 评审管理搜索功能
+        function searchReviews() {
+            const searchName = document.getElementById('reviewSearchName').value.toLowerCase();
+
+            // 找到所有竞赛行
+            const reviewRows = document.querySelectorAll('#reviewTable tbody tr');
+            let hasResults = false;
+
+            // 遍历所有行，根据搜索条件显示或隐藏
+            reviewRows.forEach(row => {
+                const competitionName = row.querySelector('td:first-child').textContent.toLowerCase();
+
+                if (competitionName.includes(searchName)) {
+                    row.style.display = '';
+                    hasResults = true;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            // 显示或隐藏空结果提示
+            const emptyResultMsg = document.getElementById('reviewEmptyResultMsg');
+            if (emptyResultMsg) {
+                emptyResultMsg.style.display = hasResults ? 'none' : 'block';
+            }
+        }
+
+        // 重置评审管理搜索
+        function resetReviewSearch() {
+            // 清空搜索框
+            document.getElementById('reviewSearchName').value = '';
+
+            // 显示所有竞赛行
+            const reviewRows = document.querySelectorAll('#reviewTable tbody tr');
+            reviewRows.forEach(row => {
+                row.style.display = '';
+            });
+
+            // 隐藏空结果提示
+            const emptyResultMsg = document.getElementById('reviewEmptyResultMsg');
+            if (emptyResultMsg) {
+                emptyResultMsg.style.display = 'none';
+            }
+        }
+
+        // 更新评审管理页面，显示当前用户作为评审教师的比赛
+        function updateReviewManagement() {
+            const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
+            const reviewTableBody = document.querySelector('#reviewTable tbody');
+            if (!reviewTableBody) return;
+
+            reviewTableBody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 40px; color: #999;">加载中...</td></tr>';
+
+            fetch('/api/competitions/review', {
+                method: 'GET',
+                headers: {
+                    'Authorization': 'Bearer ' + localStorage.getItem('token')
+                }
+            })
+                .then(response => response.json())
+                .then(result => {
+                    if (!result.success || !result.data || result.data.length === 0) {
+                        reviewTableBody.innerHTML = `
+                        <tr>
+                            <td colspan="5" style="text-align: center; padding: 40px; color: #999;">
+                                您还没有需要评审的竞赛
+                            </td>
+                        </tr>
+                    `;
+                        return;
+                    }
+
+                    reviewTableBody.innerHTML = '';
+                    result.data.forEach(competition => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                        <td>${competition.name}</td>
+                        <td id="pendingCount-${competition.id}">加载中...</td>
+                        <td id="reviewedCount-${competition.id}">加载中...</td>
+                        <td>${formatDate(competition.endTime) || '未设置'}</td>
+                        <td>
+                            <button class="btn btn-primary" onclick="startReview('${competition.id}', '${escapeHtml(competition.name).replace(/'/g, "\\'")}')">开始评审</button>
+                        </td>
+                    `;
+                        reviewTableBody.appendChild(row);
+                        // 加载评审统计
+                        loadReviewCounts(competition.id);
+                    });
+                })
+                .catch(error => {
+                    console.error('更新评审管理页面失败:', error);
+                    reviewTableBody.innerHTML = `
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 40px; color: #999;">
+                            加载失败，请刷新页面
+                        </td>
+                    </tr>
+                `;
+                });
+        }
+
+        // 加载评审计数
+        async function loadReviewCounts(competitionId) {
+            try {
+                var resp = await fetch('/api/reviews/competition/' + competitionId, {
+                    headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('token') || '') }
+                });
+                var r = await resp.json();
+                if (r.success && r.data) {
+                    var reviews = r.data;
+                    var pending = reviews.filter(function(x) { return x.status === 'pending'; }).length;
+                    var completed = reviews.filter(function(x) { return x.status === 'completed'; }).length;
+                    var pEl = document.getElementById('pendingCount-' + competitionId);
+                    var rEl = document.getElementById('reviewedCount-' + competitionId);
+                    if (pEl) pEl.textContent = pending;
+                    if (rEl) rEl.textContent = completed;
+                }
+            } catch(e) { console.error('加载评审计数失败:', e); }
+        }
+
+        // ========== 分配评审教师 ==========
+        async function loadReviewAssignCompetitions() {
+            var resp = await tapi('/api/competitions/my').then(r => r.json());
+            if (resp.success && resp.data) {
+                var list = resp.data.content || resp.data;
+                var select = document.getElementById('assignCompetition');
+                var options = list.map(function(c) {
+                    var label = c.name + (c.uploadWorks ? ' [需评审]' : '') + ' (' + (c.status || '未知') + ')';
+                    return '<option value="' + c.id + '">' + label + '</option>';
+                }).join('');
+                if (options) {
+                    select.innerHTML = '<option value="">请选择竞赛</option>' + options;
+                } else {
+                    select.innerHTML = '<option value="">暂无竞赛</option>';
+                }
+            }
+        }
+
+        async function loadRegistrationsForAssign() {
+            var compId = document.getElementById('assignCompetition').value;
+            if (!compId) { document.getElementById('registrationsForAssign').innerHTML = ''; return; }
+
+            var [regResp, pendResp, teacherResp] = await Promise.all([
+                tapi('/api/registrations/competition/' + compId).then(r => r.json()),
+                tapi('/api/reviews/pending/' + compId).then(r => r.json()),
+                tapi('/api/auth/teachers').then(r => r.json())
+            ]);
+
+            var registrations = regResp.success ? (regResp.data || []) : [];
+            var pending = pendResp.success ? (pendResp.data || []) : [];
+            var teachers = teacherResp.success ? (teacherResp.data || []) : [];
+
+            var teacherMap = {};
+            teachers.forEach(function(t) { teacherMap[t.id] = t.name || t.username; });
+
+            var container = document.getElementById('registrationsForAssign');
+            if (registrations.length === 0) {
+                container.innerHTML = '<p style="text-align:center;padding:20px;color:#999;">该竞赛暂无报名记录</p>';
+                return;
+            }
+
+            container.innerHTML = '<table style="width:100%;border-collapse:collapse;"><thead><tr><th>报名ID</th><th>学生</th><th>状态</th><th>已分配评审</th><th>操作</th></tr></thead><tbody>' + registrations.map(function(r) {
+                var assigned = pending.filter(function(p) { return p.registrationId === r.id; });
+                var assignedNames = assigned.map(function(a) { return teacherMap[a.reviewerId] || ('教师#' + a.reviewerId); }).join(', ');
+                return '<tr><td>' + r.id + '</td><td>' + (r.userId || '-') + '</td><td>' + (r.status || '-') + '</td><td>' + (assignedNames || '<span style="color:#999;">未分配</span>') + '</td><td><button class="btn btn-outline" onclick="manualAssign(' + compId + ',' + r.id + ')" style="padding:4px 8px;font-size:12px;">开始评审</button></td></tr>';
+            }).join('') + '</tbody></table>';
+        }
+
+        async function showManualAssign() {
+            var compId = document.getElementById('assignCompetition').value;
+            if (!compId) { alert('请先选择竞赛'); return; }
+            // 加载教师列表供手动分配使用
+            var teachResp = await tapi('/api/auth/teachers').then(r => r.json());
+            if (!teachResp.success || !teachResp.data || teachResp.data.length === 0) {
+                alert('获取教师列表失败');
+                return;
+            }
+            var teacherList = teachResp.data.map(function(t) { return t.username + ' (' + t.name + ')'; }).join('\n');
+            alert('可用评审教师（用户名+姓名）：\n' + teacherList + '\n\n请在下方报名列表中点击"开始评审"按钮，输入教师的用户名进行分配');
+        }
+
+        async function manualAssign(competitionId, registrationId) {
+            var reviewerName = prompt('请输入评审教师的用户名:');
+            if (!reviewerName) return;
+            var teachResp = await tapi('/api/auth/teachers').then(r => r.json());
+            if (!teachResp.success) { alert('获取教师列表失败'); return; }
+            var found = teachResp.data.find(function(t) { return t.username === reviewerName; });
+            if (!found) { alert('未找到该教师，请检查用户名是否正确'); return; }
+            var assignResp = await tapi('/api/reviews/assign', { method: 'POST', body: JSON.stringify({ competitionId: parseInt(competitionId), registrationId: parseInt(registrationId), reviewerId: found.id }) }).then(r => r.json());
+            alert(assignResp.message);
+            if (assignResp.success) loadRegistrationsForAssign();
+        }
+
+        async function autoAssignReviewers() {
+            var compId = document.getElementById('assignCompetition').value;
+            if (!compId) { alert('请先选择竞赛'); return; }
+
+            var compResp = await tapi('/api/competitions/' + compId).then(r => r.json());
+            if (!compResp.success || !compResp.data) { alert('获取竞赛信息失败'); return; }
+
+            var comp = compResp.data;
+            if (!comp.uploadWorks) { alert('该竞赛未开启作品上传，无需分配评审'); return; }
+            if (!comp.reviewers) { alert('该竞赛未设置评审教师，请先在"创建竞赛"或"我的竞赛→编辑"中设置评审教师'); return; }
+
+            var reviewers = comp.reviewers.split(',').map(function(s) { return s.trim(); }).filter(function(s) { return s; });
+            if (reviewers.length === 0) { alert('该竞赛未设置评审教师'); return; }
+
+            var teachResp = await tapi('/api/auth/teachers').then(r => r.json());
+            if (!teachResp.success) { alert('获取教师列表失败'); return; }
+
+            var reviewerIds = [];
+            var notFound = [];
+            reviewers.forEach(function(name) {
+                var found = teachResp.data.find(function(t) { return t.name === name || t.username === name; });
+                if (found) { reviewerIds.push(found.id); } else { notFound.push(name); }
+            });
+
+            if (notFound.length > 0) { alert('未找到以下评审教师: ' + notFound.join(', ')); }
+            if (reviewerIds.length === 0) { alert('未找到匹配的评审教师'); return; }
+
+            if (!confirm('确认为竞赛「' + comp.name + '」随机分配 ' + reviewerIds.length + ' 位评审教师？')) return;
+
+            var assignResp = await tapi('/api/reviews/auto-assign', { method: 'POST', body: JSON.stringify({ competitionId: parseInt(compId), reviewerIds: reviewerIds }) }).then(r => r.json());
+            alert(assignResp.message);
+            if (assignResp.success) {
+                loadRegistrationsForAssign();
+            }
+        }
+
+        // 开始评审
+        async function startReview(competitionId, competitionName) {
+            var reviewModal = document.createElement('div');
+            reviewModal.className = 'modal';
+            reviewModal._competitionId = competitionId;
+            reviewModal.innerHTML =
+                '<div class="modal-content" style="width:800px;max-height:90vh;overflow:auto;min-width:600px;">' +
+                    '<div class="modal-header">' +
+                        '<h3>评审 - ' + escapeHtml(competitionName) + '</h3>' +
+                        '<button onclick="this.closest(\'.modal\').remove()" style="background:none;border:none;font-size:20px;cursor:pointer;">&times;</button>' +
+                    '</div>' +
+                    '<div class="modal-body" id="reviewModalBody">' +
+                        '<p style="text-align:center;padding:40px;color:#999;">加载参赛作品...</p>' +
+                    '</div>' +
+                    '<div class="modal-footer">' +
+                        '<button class="btn btn-outline" onclick="this.closest(\'.modal\').remove()">取消</button>' +
+                        '<button class="btn btn-primary" id="reviewSubmitBtn" onclick="submitReview(\'' + escapeHtml(competitionName).replace(/'/g, "\\'") + '\', this)" disabled>请先选择作品</button>' +
+                    '</div>' +
+                '</div>';
+            document.body.appendChild(reviewModal);
+            reviewModal.style.display = 'flex';
+
+            try {
+                var [regResp, teamResp] = await Promise.all([
+                    fetch('/api/registrations/competition/' + competitionId, {
+                        headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('token') || '') }
+                    }).then(function(r) { return r.json(); }),
+                    fetch('/api/teams?competitionId=' + competitionId, {
+                        headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('token') || '') }
+                    }).then(function(r) { return r.json(); })
+                ]);
+
+                var body = document.getElementById('reviewModalBody');
+                if (!regResp.success || !regResp.data || regResp.data.length === 0) {
+                    body.innerHTML = '<p style="text-align:center;padding:40px;color:#999;">暂无已报名的参赛作品</p>';
+                    return;
+                }
+                var regs = regResp.data.filter(function(x) { return x.status === 'approved' || x.status === 'pending'; });
+                if (regs.length === 0) {
+                    body.innerHTML = '<p style="text-align:center;padding:40px;color:#999;">暂无待评审的参赛作品</p>';
+                    return;
+                }
+
+                // 构建团队信息映射
+                var teamMap = {};
+                if (teamResp.success && teamResp.data) {
+                    teamResp.data.forEach(function(t) { teamMap[t.id] = t; });
+                }
+
+                var regDataMap = {};
+                regs.forEach(function(reg) { regDataMap[reg.id] = reg; });
+                reviewModal._regDataMap = regDataMap;
+                reviewModal._teamMap = teamMap;
+
+                var html = '<div style="margin-bottom:20px;"><h4>选择参赛作品</h4>' +
+                    '<select id="reviewRegistration" style="width:100%;padding:8px;border:1px solid #d9d9d9;border-radius:4px;" onchange="selectReviewRegistration(this)">' +
+                    '<option value="">请选择...</option>';
+                regs.forEach(function(reg) {
+                    var teamName = (reg.teamId && teamMap[reg.teamId]) ? (' - 团队: ' + teamMap[reg.teamId].name) : ' - 个人参赛';
+                    html += '<option value="' + reg.id + '">' +
+                        '报名#' + reg.id + teamName + ' (用户ID: ' + (reg.userId || '-') + ', ' + formatDate(reg.registerTime) + ')</option>';
+                });
+                html += '</select></div>' +
+                    '<div id="reviewContent" style="margin-top:20px;padding:15px;background:#f8f9fa;border-radius:8px;"><p style="color:#999;">请选择参赛作品查看详情并评审</p></div>' +
+                    '<div style="margin-top:20px;"><h4>评审评分</h4>' +
+                        '<p style="font-size:12px;color:#999;margin-bottom:10px;">根据以下四个维度对作品进行评分（每项0-100分）</p>' +
+                        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-top:10px;">' +
+                            '<div><label>创新性（0-100分）：</label><div style="font-size:11px;color:#888;">作品的创新程度和原创性</div><input type="number" id="scoreInnovation" min="0" max="100" value="80" style="width:100%;margin-top:4px;"></div>' +
+                            '<div><label>技术难度（0-100分）：</label><div style="font-size:11px;color:#888;">技术实现的复杂度和挑战性</div><input type="number" id="scoreTech" min="0" max="100" value="80" style="width:100%;margin-top:4px;"></div>' +
+                            '<div><label>实用性（0-100分）：</label><div style="font-size:11px;color:#888;">作品的实际应用价值</div><input type="number" id="scorePractical" min="0" max="100" value="80" style="width:100%;margin-top:4px;"></div>' +
+                            '<div><label>完整性（0-100分）：</label><div style="font-size:11px;color:#888;">作品功能完整度和完成质量</div><input type="number" id="scoreComplete" min="0" max="100" value="80" style="width:100%;margin-top:4px;"></div>' +
+                        '</div></div>' +
+                    '<div style="margin-top:20px;"><h4>评审意见</h4>' +
+                        '<textarea id="reviewComment" placeholder="请输入详细的评审意见，包括作品优点、不足和改进建议等" style="width:100%;height:100px;margin-top:10px;padding:10px;border:1px solid #ddd;border-radius:4px;resize:vertical;"></textarea></div>';
+                body.innerHTML = html;
+            } catch(e) {
+                console.error('加载参赛作品失败:', e);
+                document.getElementById('reviewModalBody').innerHTML = '<p style="text-align:center;padding:40px;color:#999;">加载失败，请重试</p>';
+            }
+        }
+
+        // 选择评审作品
+        function selectReviewRegistration(selectEl) {
+            var modal = selectEl.closest('.modal');
+            var regId = selectEl.value;
+            modal._registrationId = regId;
+            var btn = document.getElementById('reviewSubmitBtn');
+            var content = document.getElementById('reviewContent');
+            if (regId) {
+                btn.disabled = false;
+                btn.textContent = '提交评审';
+                var reg = modal._regDataMap ? modal._regDataMap[regId] : null;
+                var teamMap = modal._teamMap || {};
+                if (reg) {
+                    // 加载用户详细信息
+                    fetch('/api/auth/teachers', { headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('token') || '') } }).then(function(r) { return r.json(); }).then(function(teacherData) {});
+                    var userFetch = tapi('/api/auth/check-username?username=placeholder').then(function() { return null; }).catch(function() { return null; });
+
+                    var teamInfo = '';
+                    if (reg.teamId && teamMap[reg.teamId]) {
+                        var team = teamMap[reg.teamId];
+                        teamInfo = '<div style="margin-top:8px;"><strong>团队名称：</strong>' + escapeHtml(team.name) + '</div>' +
+                            '<div><strong>团队状态：</strong>' + escapeHtml(team.status || '未知') + '</div>' +
+                            '<div><strong>团队宣言：</strong>' + escapeHtml(team.declaration || '暂无') + '</div>';
+                    }
+
+                    content.innerHTML = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">' +
+                        '<div><strong>报名ID：</strong>' + regId + '</div>' +
+                        '<div><strong>参赛用户ID：</strong>' + (reg.userId || '-') + '</div>' +
+                        '<div><strong>团队ID：</strong>' + (reg.teamId || '个人参赛') + '</div>' +
+                        '<div><strong>报名时间：</strong>' + formatDate(reg.registerTime) + '</div>' +
+                        '<div><strong>报名状态：</strong><span style="color:' + (reg.status === 'approved' ? '#27ae60' : '#f39c12') + ';">' + escapeHtml(reg.status || '未知') + '</span></div>' +
+                        '</div>' + teamInfo;
+
+                    // 异步加载用户信息
+                    if (reg.userId) {
+                        fetch('/api/registrations/competition/' + (modal._competitionId || 0), {
+                            headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('token') || '') }
+                        }).then(function(r) { return r.json(); }).then(function(regData) {
+                            // 用户信息已在注册数据中，通过用户列表获取
+                        });
+                    }
+                } else {
+                    content.innerHTML = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;">' +
+                        '<div><strong>报名ID：</strong>' + regId + '</div>' +
+                        '<div><strong>报名时间：</strong>未知</div>' +
+                        '</div>';
+                }
+            } else {
+                btn.disabled = true;
+                btn.textContent = '请先选择作品';
+                content.innerHTML = '<p style="color:#999;">请选择参赛作品查看详情并评审</p>';
+            }
+        }
+
+        // 提交评审
+        async function submitReview(competitionName, button) {
+            var reviewModal = button.closest('.modal');
+            var inputs = reviewModal.querySelectorAll('input[type="number"]');
+            var commentEl = reviewModal.querySelector('textarea');
+            var competitionId = reviewModal._competitionId;
+            var registrationId = reviewModal._registrationId;
+
+            if (!competitionId || !registrationId) {
+                alert('评审数据不完整，请重新打开评审窗口');
+                return;
+            }
+
+            var scores = [];
+            inputs.forEach(function(inp) { scores.push(parseInt(inp.value) || 0); });
+            var comment = commentEl ? commentEl.value : '';
+            if (!comment.trim()) {
+                alert('请填写评审意见');
+                return;
+            }
+
+            button.disabled = true;
+            button.textContent = '提交中...';
+
+            try {
+                var resp = await fetch('/api/reviews', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (localStorage.getItem('token') || '') },
+                    body: JSON.stringify({
+                        competitionId: parseInt(competitionId),
+                        registrationId: parseInt(registrationId),
+                        score: scores.length > 0 ? Math.round(scores.reduce(function(a,b){return a+b;},0) / scores.length) : 0,
+                        comment: comment,
+                        scores: scores
+                    })
+                });
+                var result = await resp.json();
+                if (result.success) {
+                    reviewModal.remove();
+                    alert('评审已成功提交，系统已通知参赛学生');
+                    // 刷新评审管理表格
+                    loadReviewCounts(competitionId);
+                    updateReviewManagement();
+                } else {
+                    alert(result.message || '提交失败');
+                }
+            } catch(e) {
+                console.error('提交评审失败:', e);
+                alert('提交失败，请重试');
+            }
+            button.disabled = false;
+            button.textContent = '提交评审';
+        }
+
+        // 加载教师创建的竞赛到消息页面的下拉框
+        async function loadMyCompetitionsForMessage() {
+            try {
+                var competitionSelect = document.getElementById('messageCompetition');
+                if (!competitionSelect) return;
+                competitionSelect.innerHTML = '<option value="">加载中...</option>';
+
+                var resp = await fetch('/api/competitions/my', {
+                    headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('token') || '') }
+                });
+                var result = await resp.json();
+                if (!result.success || !result.data) {
+                    competitionSelect.innerHTML = '<option value="">加载失败</option>';
+                    return;
+                }
+                var myCompetitions = result.data;
+                if (myCompetitions.length === 0) {
+                    competitionSelect.innerHTML = '<option value="">您还没有创建任何竞赛</option>';
+                    return;
+                }
+                competitionSelect.innerHTML = '<option value="">请选择竞赛</option>';
+                myCompetitions.forEach(function(c) {
+                    competitionSelect.innerHTML += '<option value="' + c.id + '">' + escapeHtml(c.name) + '</option>';
+                });
+            } catch(e) {
+                console.error('加载竞赛列表失败:', e);
+            }
+        }
+
+        // 选择竞赛后的处理
+        function onCompetitionSelected() {
+            const competitionId = document.getElementById('messageCompetition').value;
+            const studentSelectArea = document.getElementById('studentSelectArea');
+            const studentSelect = document.getElementById('messageRecipient');
+
+            if (!competitionId) {
+                studentSelectArea.style.display = 'none';
+                return;
+            }
+
+            // 显示学生选择区域
+            studentSelectArea.style.display = 'block';
+
+            // 加载该竞赛的学生列表
+            loadCompetitionStudents();
+
+            // 重置发送对象类型为"所有参赛学生"
+            document.getElementById('messageRecipientType').value = 'all';
+            document.getElementById('specificStudentSelect').style.display = 'none';
+        }
+
+        // 切换是否指定学生
+        function toggleStudentSelect() {
+            const recipientType = document.getElementById('messageRecipientType').value;
+            const specificStudentSelect = document.getElementById('specificStudentSelect');
+
+            if (recipientType === 'specific') {
+                specificStudentSelect.style.display = 'block';
+            } else {
+                specificStudentSelect.style.display = 'none';
+            }
+        }
+
+        // 加载选定竞赛的学生列表
+        async function loadCompetitionStudents() {
+            try {
+                var competitionId = document.getElementById('messageCompetition').value;
+                var studentSelect = document.getElementById('messageRecipient');
+                if (!studentSelect) return;
+
+                if (!competitionId) {
+                    studentSelect.innerHTML = '<option value="">请先选择竞赛</option>';
+                    return;
+                }
+
+                studentSelect.innerHTML = '<option value="">加载中...</option>';
+                var resp = await fetch('/api/registrations/competition/' + competitionId, {
+                    headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('token') || '') }
+                });
+                var result = await resp.json();
+                if (!result.success || !result.data || result.data.length === 0) {
+                    studentSelect.innerHTML = '<option value="">该竞赛暂无报名学生</option>';
+                    return;
+                }
+
+                var userIds = [...new Set(result.data.map(function(r) { return r.userId; }))];
+                // 获取用户姓名映射
+                var userMap = {};
+                try {
+                    var userResp = await fetch('/api/admin/users', {
+                        headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('token') || '') }
+                    });
+                    var userResult = await userResp.json();
+                    if (userResult.success && userResult.data) {
+                        userResult.data.forEach(function(u) { userMap[u.id] = u.name || u.username; });
+                    }
+                } catch(e) { console.error('加载用户列表失败:', e); }
+                studentSelect.innerHTML = '<option value="">请选择学生</option>';
+                userIds.forEach(function(uid) {
+                    var displayName = userMap[uid] || ('用户ID: ' + uid);
+                    studentSelect.innerHTML += '<option value="' + uid + '">' + displayName + ' (ID:' + uid + ')</option>';
+                });
+            } catch(e) {
+                console.error('加载学生列表失败:', e);
+            }
+        }
+
+        // 发送消息
+        async function sendMessage() {
+            try {
+                var content = document.getElementById('messageContent').value.trim();
+                if (!content) { alert('请输入消息内容'); return; }
+
+                var competitionId = document.getElementById('messageCompetition').value;
+                if (!competitionId) { alert('请选择要发送的竞赛'); return; }
+
+                var recipientType = document.getElementById('messageRecipientType').value;
+                var userIds = [];
+
+                if (recipientType === 'all') {
+                    var resp = await fetch('/api/registrations/competition/' + competitionId, {
+                        headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('token') || '') }
+                    });
+                    var r = await resp.json();
+                    if (!r.success || !r.data || r.data.length === 0) {
+                        alert('该竞赛暂无报名学生'); return;
+                    }
+                    userIds = [...new Set(r.data.map(function(x) { return x.userId; }))];
+                } else {
+                    var selectedUser = document.getElementById('messageRecipient').value;
+                    if (!selectedUser) { alert('请选择要发送的学生'); return; }
+                    userIds = [parseInt(selectedUser)];
+                }
+
+                var resp = await fetch('/api/messages/batch-send', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (localStorage.getItem('token') || '') },
+                    body: JSON.stringify({ userIds: userIds, content: content })
+                });
+                var result = await resp.json();
+                if (result.success) {
+                    alert(result.message || '发送成功');
+                    document.getElementById('messageContent').value = '';
+                    loadMessages();
+                } else {
+                    alert(result.message || '发送失败');
+                }
+            } catch(e) {
+                console.error('发送消息失败:', e);
+                alert('发送消息失败，请重试');
+            }
+        }
+
+        // 加载用户信息到个人设置页面
+        function loadUserSettings() {
+            try {
+                const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
+
+                if (!userInfo.name) {
+                    return;
+                }
+
+                // 填充基本信息
+                document.getElementById('settingsUsername').value = userInfo.username || '';
+                document.getElementById('settingsName').value = userInfo.name || '';
+                document.getElementById('settingsCollege').value = userInfo.college || '';
+                document.getElementById('settingsPhone').value = userInfo.phone || '';
+                document.getElementById('settingsEmail').value = userInfo.email || '';
+
+                // 加载通知偏好设置
+                const notificationPreferences = userInfo.notificationPreferences || {
+                    competitionReview: true,
+                    newRegistration: true,
+                    reviewDeadline: true,
+                    systemMaintenance: true
+                };
+
+                const toggleSwitches = document.querySelectorAll('#page-settings .toggle-switch');
+                if (toggleSwitches[0]) {
+                    if (notificationPreferences.competitionReview) {
+                        toggleSwitches[0].classList.add('active');
+                    } else {
+                        toggleSwitches[0].classList.remove('active');
+                    }
+                }
+                if (toggleSwitches[1]) {
+                    if (notificationPreferences.newRegistration) {
+                        toggleSwitches[1].classList.add('active');
+                    } else {
+                        toggleSwitches[1].classList.remove('active');
+                    }
+                }
+                if (toggleSwitches[2]) {
+                    if (notificationPreferences.reviewDeadline) {
+                        toggleSwitches[2].classList.add('active');
+                    } else {
+                        toggleSwitches[2].classList.remove('active');
+                    }
+                }
+                if (toggleSwitches[3]) {
+                    if (notificationPreferences.systemMaintenance) {
+                        toggleSwitches[3].classList.add('active');
+                    } else {
+                        toggleSwitches[3].classList.remove('active');
+                    }
+                }
+            } catch (error) {
+                console.error('加载用户设置失败:', error);
+            }
+        }
+
+        async function loadReviewNotifications() {
+            try {
+                var resp = await tapi('/api/competitions/review').then(r => r.json());
+                var container = document.getElementById('reviewNotifications');
+                if (resp.success && resp.data && resp.data.length > 0) {
+                    container.innerHTML = resp.data.map(function(c) {
+                        return '<div style="padding:8px 12px;background:#e8f5e9;border-radius:4px;margin-bottom:8px;">竞赛: ' + escapeHtml(c.name) + ' - ID: ' + c.id + ' <button class="btn btn-primary" style="padding:4px 8px;font-size:12px;" onclick="switchPage(\'review\')">去评审</button></div>';
+                    }).join('');
+                } else {
+                    container.innerHTML = '<div style="text-align:center;padding:20px;color:#999;">暂无评审任务</div>';
+                }
+            } catch(e) { console.error(e); }
+        }
+
+        // 加载消息列表
+        function loadMessages() {
+            const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
+            const messageList = document.getElementById('messageList');
+            const messageEmptyTip = document.getElementById('messageEmptyTip');
+
+            if (!messageList || !messageEmptyTip) return;
+
+            fetch('/api/messages', {
+                method: 'GET',
+                headers: {
+                    'Authorization': 'Bearer ' + localStorage.getItem('token')
+                }
+            })
+                .then(response => response.json())
+                .then(result => {
+                    if (!result.success || !result.data || result.data.length === 0) {
+                        messageList.style.display = 'none';
+                        messageEmptyTip.style.display = 'block';
+                        return;
+                    }
+
+                    messageList.style.display = 'block';
+                    messageEmptyTip.style.display = 'none';
+
+                    messageList.innerHTML = '';
+                    result.data.forEach(message => {
+                        const li = document.createElement('li');
+                        li.className = 'message-item';
+                        li.innerHTML = `
+                        <div>
+                            <div class="message-title">
+                                来自：${message.senderName || '系统'}
+                            </div>
+                            <div class="message-content">${message.content}</div>
+                            <div class="message-time">${new Date(message.sendTime).toLocaleString()}</div>
+                        </div>
+                        <div style="display: flex; gap: 5px;">
+                            <button class="btn btn-outline" style="font-size:12px;" onclick="markTeacherMessageAsRead('${message.id}', this)">标记已读</button>
+                            <button class="btn btn-danger" style="font-size:12px;" onclick="deleteTeacherMessage('${message.id}', this)">删除</button>
+                        </div>
+                    `;
+                        messageList.appendChild(li);
+                    });
+                })
+                .catch(error => {
+                    console.error('加载消息列表失败:', error);
+                    messageList.style.display = 'none';
+                    messageEmptyTip.style.display = 'block';
+                });
+        }
+
+        // 标记教师消息为已读
+        window.markTeacherMessageAsRead = function (id, btn) {
+            fetch(`/api/messages/${id}/read`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + localStorage.getItem('token')
+                }
+            })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success) {
+                        btn.textContent = '已读';
+                        btn.disabled = true;
+                    }
+                })
+                .catch(error => {
+                    console.error('标记已读失败:', error);
+                });
+        };
+
+        // 删除教师消息
+        window.deleteTeacherMessage = function (id, btn) {
+            fetch(`/api/messages/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': 'Bearer ' + localStorage.getItem('token')
+                }
+            })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success) {
+                        btn.closest('.message-item').remove();
+                    }
+                })
+                .catch(error => {
+                    console.error('删除消息失败:', error);
+                });
+        };
+
+        // 标记消息已读
+        function markAsRead(button) {
+            const messageItem = button.closest('.message-item');
+            if (messageItem) {
+                messageItem.style.opacity = '0.6';
+                button.textContent = '已读';
+                button.disabled = true;
+            }
+        }
+
+        // 删除消息
+        function deleteMessage(button) {
+            const messageItem = button.closest('.message-item');
+            if (messageItem) {
+                messageItem.style.opacity = '0';
+                messageItem.style.height = '0';
+                messageItem.style.margin = '0';
+                messageItem.style.padding = '0';
+                messageItem.style.overflow = 'hidden';
+                messageItem.style.transition = 'all 0.3s ease';
+
+                setTimeout(() => {
+                    messageItem.remove();
+                }, 300);
+            }
+        }
+
+        async function uploadAvatar() {
+            var fileInput = document.getElementById('avatarFileInput');
+            var file = fileInput.files[0];
+            if (!file) return;
+            var formData = new FormData();
+            formData.append('file', file);
+            try {
+                var resp = await fetch('/api/auth/avatar', {
+                    method: 'POST',
+                    headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('token') || '') },
+                    body: formData
+                });
+                var result = await resp.json();
+                if (result.success) {
+                    var avatarUrl = result.data.avatar;
+                    document.getElementById('settingsAvatar').src = avatarUrl;
+                    document.getElementById('settingsAvatar').style.display = 'inline-block';
+                    var userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
+                    userInfo.avatar = avatarUrl;
+                    localStorage.setItem('userInfo', JSON.stringify(userInfo));
+                    updateHeaderUser(userInfo);
+                    alert('头像上传成功');
+                } else {
+                    alert(result.message || '上传失败');
+                }
+            } catch(e) {
+                console.error('头像上传失败:', e);
+                alert('上传失败，请重试');
+            }
+        }
+
+        // 保存设置
+        async function saveSettings() {
+            const name = document.getElementById('settingsName').value;
+            const college = document.getElementById('settingsCollege').value;
+            const phone = document.getElementById('settingsPhone').value;
+            const email = document.getElementById('settingsEmail').value;
+
+            const notificationPreferences = {
+                competitionReview: document.querySelectorAll('#page-settings .toggle-switch')[0].classList.contains('active'),
+                newRegistration: document.querySelectorAll('#page-settings .toggle-switch')[1].classList.contains('active'),
+                reviewDeadline: document.querySelectorAll('#page-settings .toggle-switch')[2].classList.contains('active'),
+                systemMaintenance: document.querySelectorAll('#page-settings .toggle-switch')[3].classList.contains('active')
+            };
+
+            const oldPassword = document.querySelector('#page-settings input[type="password"][placeholder="请输入原密码"]').value;
+            const newPassword = document.querySelector('#page-settings input[type="password"][placeholder="请输入新密码"]').value;
+            const confirmPassword = document.querySelector('#page-settings input[type="password"][placeholder="请确认新密码"]').value;
+
+            if (oldPassword || newPassword || confirmPassword) {
+                if (!oldPassword || !newPassword || !confirmPassword) {
+                    alert('请填写完整的密码修改信息');
+                    return;
+                }
+                if (newPassword !== confirmPassword) {
+                    alert('新密码和确认密码不一致');
+                    return;
+                }
+                if (newPassword.length < 6) {
+                    alert('新密码长度至少为6位');
+                    return;
+                }
+            }
+
+            var token = localStorage.getItem('token') || '';
+
+            if (oldPassword && newPassword) {
+                var pwdResp = await fetch('/api/auth/change-password', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                    body: JSON.stringify({ oldPassword: oldPassword, newPassword: newPassword })
+                }).then(r => r.json());
+                if (!pwdResp.success) { alert(pwdResp.message); return; }
+            }
+
+            var userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
+            var updateBody = { id: userInfo.id, name: name, college: college, phone: phone, email: email };
+            var resp = await fetch('/api/auth/update', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                body: JSON.stringify(updateBody)
+            }).then(r => r.json());
+
+            if (resp.success) {
+                userInfo.name = name;
+                userInfo.college = college;
+                userInfo.phone = phone;
+                userInfo.email = email;
+                userInfo.notificationPreferences = notificationPreferences;
+                localStorage.setItem('userInfo', JSON.stringify(userInfo));
+                updateHeaderUser(userInfo);
+                if (oldPassword) {
+                    document.querySelector('#page-settings input[type="password"][placeholder="请输入原密码"]').value = '';
+                    document.querySelector('#page-settings input[type="password"][placeholder="请输入新密码"]').value = '';
+                    document.querySelector('#page-settings input[type="password"][placeholder="请确认新密码"]').value = '';
+                }
+                alert('保存成功' + (oldPassword ? '，密码已修改' : ''));
+            } else {
+                alert(resp.message || '保存失败');
+            }
+        }
+
+        // 评审教师列表项交互
+        document.addEventListener('DOMContentLoaded', function () {
+            // 为评审教师列表项添加悬停效果
+            const reviewerItems = document.querySelectorAll('.reviewer-item');
+            reviewerItems.forEach(item => {
+                // 悬停效果
+                item.addEventListener('mouseenter', function () {
+                    this.style.backgroundColor = 'rgba(102, 126, 234, 0.05)';
+                });
+
+                item.addEventListener('mouseleave', function () {
+                    // 只有在未选中的情况下才恢复默认样式
+                    const checkbox = this.querySelector('input[type="checkbox"]');
+                    if (!checkbox.checked) {
+                        this.style.backgroundColor = 'white';
+                    }
+                });
+
+                // 点击列表项时切换复选框状态
+                item.addEventListener('click', function (e) {
+                    if (e.target.tagName !== 'INPUT') {
+                        const checkbox = this.querySelector('input[type="checkbox"]');
+                        checkbox.checked = !checkbox.checked;
+                        updateReviewerItemStyle(this, checkbox.checked);
+                    }
+                });
+
+                // 监听复选框变化
+                const checkbox = item.querySelector('input[type="checkbox"]');
+                checkbox.addEventListener('change', function () {
+                    updateReviewerItemStyle(item, this.checked);
+                });
+            });
+        });
+
+        // 更新评审教师列表项样式
+        function updateReviewerItemStyle(item, isChecked) {
+            if (isChecked) {
+                item.style.backgroundColor = 'rgba(102, 126, 234, 0.05)';
+            } else {
+                item.style.backgroundColor = 'white';
+            }
+        }
+
+        // 创建竞赛表单提交
+        document.addEventListener('DOMContentLoaded', function () {
+            const createForm = document.getElementById('createForm');
+            if (createForm) {
+                createForm.addEventListener('submit', function (e) {
+                    e.preventDefault();
+
+                    // 清除之前的错误提示
+                    document.querySelectorAll('.error-message').forEach(el => el.remove());
+
+                    // 获取表单元素
+                    const competitionNameInput = this.querySelector('input[placeholder="请输入竞赛名称"]');
+                    const selects = this.querySelectorAll('select');
+                    const competitionTypeSelect = selects[0];
+                    const competitionFormatSelect = selects[1];
+                    const registrationStartTimeInput = this.querySelectorAll('input[type="datetime-local"]')[0];
+                    const registrationEndTimeInput = this.querySelectorAll('input[type="datetime-local"]')[1];
+                    const competitionStartTimeInput = this.querySelectorAll('input[type="datetime-local"]')[2];
+                    const competitionEndTimeInput = this.querySelectorAll('input[type="datetime-local"]')[3];
+                    const maxParticipantsInput = this.querySelector('input[type="number"][placeholder="请输入最大人数"]');
+                    const descriptionInput = this.querySelector('textarea[placeholder="请输入竞赛的详细描述信息"]');
+                    const reviewersContainer = this.querySelector('.reviewer-grid');
+
+                    // 检查评审教师选择
+                    const selectedReviewers = Array.from(this.querySelectorAll('input[name="reviewers"]:checked')).map(input => input.value);
+
+                    // 验证表单
+                    let isValid = true;
+
+                    if (!competitionNameInput.value.trim()) {
+                        isValid = false;
+                        showError(competitionNameInput, '请输入竞赛名称');
+                    }
+
+                    if (competitionTypeSelect.value === '请选择竞赛类型') {
+                        isValid = false;
+                        showError(competitionTypeSelect, '请选择竞赛类型');
+                    }
+
+                    if (competitionFormatSelect.value === '请选择赛制') {
+                        isValid = false;
+                        showError(competitionFormatSelect, '请选择竞赛赛制');
+                    }
+
+                    if (!registrationStartTimeInput.value) {
+                        isValid = false;
+                        showError(registrationStartTimeInput, '请选择报名开始时间');
+                    }
+
+                    if (!registrationEndTimeInput.value) {
+                        isValid = false;
+                        showError(registrationEndTimeInput, '请选择报名截止时间');
+                    }
+
+                    if (!competitionStartTimeInput.value) {
+                        isValid = false;
+                        showError(competitionStartTimeInput, '请选择竞赛开始时间');
+                    }
+
+                    if (!competitionEndTimeInput.value) {
+                        isValid = false;
+                        showError(competitionEndTimeInput, '请选择竞赛结束时间');
+                    }
+
+                    if (!maxParticipantsInput.value || parseInt(maxParticipantsInput.value) <= 0) {
+                        isValid = false;
+                        showError(maxParticipantsInput, '请输入有效的最大报名人数');
+                    }
+
+                    if (!descriptionInput.value.trim()) {
+                        isValid = false;
+                        showError(descriptionInput, '请输入竞赛描述');
+                    }
+
+                    if (selectedReviewers.length === 0) {
+                        isValid = false;
+                        showError(reviewersContainer, '请至少选择一位评审教师');
+                    }
+
+                    // 如果验证通过，提交表单
+                    if (isValid) {
+                        // 获取当前用户信息
+                        const currentUserInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
+
+                        // 构建竞赛对象
+                        const newCompetition = {
+                            name: competitionNameInput.value.trim(),
+                            type: competitionTypeSelect.value,
+                            registerDeadline: registrationEndTimeInput.value,
+                            startTime: competitionStartTimeInput.value,
+                            endTime: competitionEndTimeInput.value,
+                            maxTeamSize: parseInt(maxParticipantsInput.value),
+                            description: descriptionInput.value.trim(),
+                            reviewers: selectedReviewers.join(','),
+                            status: 'pending'
+                        };
+
+                        // 调用后端API创建竞赛
+                        fetch('/api/competitions', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': 'Bearer ' + localStorage.getItem('token')
+                            },
+                            body: JSON.stringify(newCompetition)
+                        })
+                            .then(response => response.json())
+                            .then(result => {
+                                if (result.success) {
+                                    handleCreateSuccess(result.data || newCompetition);
+                                } else {
+                                    showError(submitBtn, result.message || '创建失败');
+                                }
+                            })
+                            .catch(error => {
+                                console.error('创建竞赛失败:', error);
+                                showError(submitBtn, '网络错误，请稍后重试');
+                            });
+                    }
+
+                    function handleCreateSuccess(competition) {
+                        sendReviewerNotifications(competition);
+                        sendAdminReviewNotification(competition);
+
+                        const feedbackElement = document.createElement('div');
+                        feedbackElement.style.cssText = `
+                            position: fixed;
+                            top: 50%;
+                            left: 50%;
+                            transform: translate(-50%, -50%);
+                            background: #333;
+                            color: white;
+                            padding: 15px 25px;
+                            border-radius: 8px;
+                            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+                            z-index: 1000;
+                            transition: all 0.3s;
+                            font-size: 16px;
+                            font-weight: 500;
+                        `;
+                        feedbackElement.textContent = '提交成功！等待管理员审核';
+                        document.body.appendChild(feedbackElement);
+
+                        setTimeout(() => {
+                            feedbackElement.style.opacity = '0';
+                            setTimeout(() => {
+                                feedbackElement.remove();
+                                document.querySelectorAll('.modal-overlay').forEach(el => el.remove());
+                                switchPage('competitions');
+                            }, 300);
+                        }, 3000);
+                    }
+                });
+
+                // 显示错误信息的函数
+                function showError(element, message) {
+                    const errorElement = document.createElement('div');
+                    errorElement.className = 'error-message';
+                    errorElement.style.cssText = 'color: red; font-size: 12px; margin-top: 5px;';
+                    errorElement.textContent = message;
+                    element.parentNode.appendChild(errorElement);
+                }
+
+            }
+        }
+    );
+
+        // 生成评审教师列表
+        function generateReviewerList() {
+            const reviewerGrid = document.getElementById('reviewerGrid');
+            if (!reviewerGrid) return;
+
+            reviewerGrid.innerHTML = '<div style="text-align: center; padding: 40px; color: #999;">加载中...</div>';
+
+            const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
+            const currentTeacherName = userInfo.name;
+
+            console.log('🔄 正在加载评审教师列表...');
+            fetch('/api/auth/teachers', {
+                method: 'GET',
+                headers: {
+                    'Authorization': 'Bearer ' + localStorage.getItem('token')
+                }
+            })
+                .then(response => {
+                    console.log('📡 评审教师API响应状态:', response.status);
+                    return response.json();
+                })
+                .then(result => {
+                    reviewerGrid.innerHTML = '';
+
+                    if (!result.success || !result.data || result.data.length === 0) {
+                        reviewerGrid.innerHTML = `
+                            <div style="text-align: center; padding: 40px; color: #999;">
+                                暂无其他教师
+                            </div>
+                        `;
+                        return;
+                    }
+
+                    const teachers = result.data.filter(t => t.name !== currentTeacherName);
+
+                    if (teachers.length === 0) {
+                        reviewerGrid.innerHTML = `
+                            <div style="text-align: center; padding: 40px; color: #999;">
+                                暂无其他教师
+                            </div>
+                        `;
+                        return;
+                    }
+
+                    teachers.forEach((teacher, index) => {
+                        const reviewerCard = document.createElement('div');
+                        reviewerCard.className = 'reviewer-card';
+                        reviewerCard.innerHTML = `
+                            <input type="checkbox" id="reviewer${index + 1}" name="reviewers" value="${teacher.name}">
+                            <label for="reviewer${index + 1}" class="reviewer-label">
+                                <div class="reviewer-info">
+                                    <div class="reviewer-name">${teacher.name}</div>
+                                    <div class="reviewer-department">${teacher.college || '未知学院'}</div>
+                                </div>
+                            </label>
+                        `;
+                        reviewerGrid.appendChild(reviewerCard);
+                    });
+
+                    console.log('评审教师列表生成成功');
+                })
+                .catch(error => {
+                    console.error('生成评审教师列表失败:', error);
+                    reviewerGrid.innerHTML = `
+                        <div style="text-align: center; padding: 40px; color: #999;">
+                            加载评审教师失败
+                        </div>
+                    `;
+                });
+        }
+
+        // 页面加载时更新草稿箱
+        window.addEventListener('load', function () {
+            generateReviewerList();
+            loadBrowseCompetitions();
+        });
+
+        // 切换到创建竞赛页面时重新生成评审教师列表
+        document.querySelectorAll('.sidebar-menu a[data-page]').forEach(item => {
+            item.addEventListener('click', function () {
+                const page = this.dataset.page;
+                if (page === 'create') {
+                    setTimeout(generateReviewerList, 100);
+                }
+            });
+        });
+
+        // ========== 后端 API 评审功能 ==========
+        function tapi(path, opts) {
+            var options = opts || {};
+            var headers = options.headers || {};
+            var token = localStorage.getItem('token');
+            if (token) headers['Authorization'] = 'Bearer ' + token;
+            headers['Content-Type'] = 'application/json';
+            return fetch(path, { ...options, headers: headers });
+        }
+
+        // 工具函数
+        function escapeHtml(str) {
+            return String(str).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/'/g, '&#39;');
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return '-';
+            var d = new Date(dateString);
+            return d.toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
+        }
+
+        function exportRegistrations() {
+            var competitionId = prompt('请输入要导出报名的竞赛ID:');
+            if (!competitionId) return;
+            window.open('/api/registrations/export/' + competitionId, '_blank');
+        }
+
+        function getSelectedReviewers() {
+            var checked = document.querySelectorAll('input[name="reviewers"]:checked');
+            return Array.from(checked).map(function(cb) { return cb.value; });
+        }
+
+        // ========== 创建竞赛 - draft + submit ==========
+        var editingDraftId = null;
+
+        async function saveAsDraft() {
+            var comp = buildCompetitionFormData();
+            comp.status = 'draft';
+            try {
+                var resp;
+                if (editingDraftId) {
+                    resp = await tapi('/api/competitions/' + editingDraftId, { method: 'PUT', body: JSON.stringify(comp) }).then(r => r.json());
+                } else {
+                    resp = await tapi('/api/competitions', { method: 'POST', body: JSON.stringify(comp) }).then(r => r.json());
+                    if (resp.success && resp.data) editingDraftId = resp.data.id;
+                }
+                alert(resp.message || (resp.success ? '草稿已保存' : '保存失败'));
+                if (resp.success) loadDrafts();
+            } catch(e) { console.error(e); }
+        }
+
+        async function submitForReview() {
+            var comp = buildCompetitionFormData();
+            comp.status = 'pending';
+            try {
+                var resp;
+                if (editingDraftId) {
+                    resp = await tapi('/api/competitions/' + editingDraftId, { method: 'PUT', body: JSON.stringify(comp) }).then(r => r.json());
+                } else {
+                    resp = await tapi('/api/competitions', { method: 'POST', body: JSON.stringify(comp) }).then(r => r.json());
+                }
+                alert(resp.message || (resp.success ? '已提交审核' : '提交失败'));
+                if (resp.success) {
+                    editingDraftId = null;
+                    document.getElementById('competitionName').value = '';
+                    document.getElementById('description').value = '';
+                    document.getElementById('startTime').value = '';
+                    document.getElementById('endTime').value = '';
+                    document.getElementById('registerDeadline').value = '';
+                    document.getElementById('maxTeamSize').value = '3';
+                    loadDrafts();
+                }
+            } catch(e) { console.error(e); }
+        }
+
+        function buildCompetitionFormData() {
+            var uploadWorks = document.getElementById('uploadWorksToggle').classList.contains('active');
+            return {
+                name: document.getElementById('competitionName').value,
+                type: document.getElementById('competitionType').value,
+                description: document.getElementById('description').value,
+                startTime: document.getElementById('startTime').value,
+                endTime: document.getElementById('endTime').value,
+                registerDeadline: document.getElementById('registerDeadline').value,
+                maxTeamSize: parseInt(document.getElementById('maxTeamSize').value) || 1,
+                reviewers: getSelectedReviewers().join(','),
+                uploadWorks: uploadWorks
+            };
+        }
+
+        async function loadDrafts() {
+            try {
+                var resp = await tapi('/api/competitions/my').then(r => r.json());
+                if (resp.success && resp.data) {
+                    var drafts = (resp.data.content || resp.data).filter(function(c) { return c.status === 'draft'; });
+                    var container = document.getElementById('draftsList');
+                    if (!container) {
+                        var form = document.querySelector('#page-create .content-section');
+                        var div = document.createElement('div');
+                        div.id = 'draftsListContainer';
+                        div.style.marginTop = '20px';
+                        div.innerHTML = '<h3>草稿箱</h3><div id="draftsList"></div>';
+                        form.appendChild(div);
+                        container = document.getElementById('draftsList');
+                    }
+                    if (drafts.length === 0) {
+                        container.innerHTML = '<div style="color:#999;">暂无草稿</div>';
+                    } else {
+                        container.innerHTML = drafts.map(function(d) {
+                            return '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px;border:1px solid #eee;border-radius:4px;margin-bottom:8px;"><span>' + escapeHtml(d.name) + ' (' + (d.type || '') + ')</span><div><button class="btn btn-outline" style="padding:4px 8px;font-size:12px;" onclick="resumeDraft(' + d.id + ')">继续编辑</button> <button class="btn btn-outline" style="padding:4px 8px;font-size:12px;color:#e74c3c;" onclick="deleteDraft(' + d.id + ')">删除</button></div></div>';
+                        }).join('');
+                    }
+                }
+            } catch(e) { console.error(e); }
+        }
+
+        async function resumeDraft(id) {
+            try {
+                var resp = await tapi('/api/competitions/' + id).then(r => r.json());
+                if (resp.success && resp.data) {
+                    var c = resp.data;
+                    document.getElementById('competitionName').value = c.name || '';
+                    document.getElementById('competitionType').value = c.type || '';
+                    document.getElementById('description').value = c.description || '';
+                    if (c.startTime) document.getElementById('startTime').value = c.startTime.substring(0, 16);
+                    if (c.endTime) document.getElementById('endTime').value = c.endTime.substring(0, 16);
+                    if (c.registerDeadline) document.getElementById('registerDeadline').value = c.registerDeadline.substring(0, 16);
+                    document.getElementById('maxTeamSize').value = c.maxTeamSize || 1;
+                    var toggle = document.getElementById('uploadWorksToggle');
+                    if (c.uploadWorks) { toggle.classList.add('active'); toggle.textContent = '是'; }
+                    else { toggle.classList.remove('active'); toggle.textContent = '否'; }
+                    editingDraftId = c.id;
+                    alert('已加载草稿，编辑后请提交审核');
+                }
+            } catch(e) { console.error(e); }
+        }
+
+        async function deleteDraft(id) {
+            if (!confirm('确定删除此草稿？')) return;
+            try {
+                await tapi('/api/competitions/' + id, { method: 'DELETE' });
+                loadDrafts();
+            } catch(e) { console.error(e); }
+        }
+
+
+        // ========== 浏览竞赛 ==========
+        async function loadBrowseCompetitions() {
+            var container = document.getElementById('browseCompetitions');
+            if (!container) return;
+            try {
+                var resp = await fetch('/api/competitions?size=100', {
+                    headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('token') || '') }
+                });
+                var result = await resp.json();
+                if (result.success && result.data) {
+                    var list = Array.isArray(result.data) ? result.data : (result.data.content || []);
+                    if (list.length === 0) {
+                        container.innerHTML = '<div style="text-align:center;padding:40px;color:#999;">暂无竞赛</div>';
+                        return;
+                    }
+                    container.innerHTML = list.map(function(c) {
+                        var statusText = c.status === 'enrolling' ? '报名中' : c.status === 'active' ? '进行中' : c.status === 'ended' ? '已结束' : c.status === 'preparing' ? '筹备中' : c.status === 'pending' ? '待审核' : c.status === 'reviewing' ? '评审中' : c.status;
+                        var statusCls = c.status === 'enrolling' || c.status === 'active' ? 'status-active' : 'status-ended';
+                        return '<div class="card" data-type="' + (c.type || '') + '" data-status="' + c.status + '" style="cursor:pointer;" onclick="viewBrowseDetail(' + c.id + ')">' +
+                            '<h3>' + escapeHtml(c.name) + '</h3>' +
+                            '<p>类型：' + escapeHtml(c.type || '未知') + '</p>' +
+                            '<p>报名截止：' + (c.registerDeadline || c.endTime || '待定') + '</p>' +
+                            '<p>创建者：' + escapeHtml(c.creator || '未知') + '</p>' +
+                            '<div class="card-footer">' +
+                            '<span class="status ' + statusCls + '">' + statusText + '</span>' +
+                            '</div></div>';
+                    }).join('');
+                }
+            } catch(e) { console.error('加载浏览竞赛失败:', e); }
+        }
+
+        function searchBrowseCompetitions() {
+            var keyword = (document.getElementById('browseSearch') || {}).value || '';
+            var type = (document.getElementById('browseType') || {}).value || '';
+            var status = (document.getElementById('browseStatus') || {}).value || '';
+            var cards = document.querySelectorAll('#browseCompetitions .card');
+            cards.forEach(function(card) {
+                var name = (card.querySelector('h3').textContent || '').toLowerCase();
+                var cardType = card.getAttribute('data-type') || '';
+                var cardStatus = card.getAttribute('data-status') || '';
+                var matchSearch = !keyword || name.indexOf(keyword.toLowerCase()) !== -1;
+                var matchType = !type || cardType === type;
+                var matchStatus = !status || cardStatus === status;
+                card.style.display = (matchSearch && matchType && matchStatus) ? '' : 'none';
+            });
+        }
+
+        function resetBrowseSearch() {
+            var s = document.getElementById('browseSearch'); if (s) s.value = '';
+            var t = document.getElementById('browseType'); if (t) t.value = '';
+            var st = document.getElementById('browseStatus'); if (st) st.value = '';
+            var cards = document.querySelectorAll('#browseCompetitions .card');
+            cards.forEach(function(card) { card.style.display = ''; });
+        }
+
+        async function viewBrowseDetail(competitionId) {
+            try {
+                var resp = await fetch('/api/competitions/' + competitionId, {
+                    headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('token') || '') }
+                });
+                var result = await resp.json();
+                if (!result.success || !result.data) { alert('获取竞赛详情失败'); return; }
+                var c = result.data;
+                var statusText = c.status === 'enrolling' ? '报名中' : c.status === 'active' ? '进行中' : c.status === 'ended' ? '已结束' : c.status === 'preparing' ? '准备中' : c.status;
+
+                var modal = document.createElement('div');
+                modal.className = 'modal';
+                var modalId = 'browse_detail_' + Date.now();
+                modal.id = modalId;
+                modal.innerHTML =
+                    '<div class="modal-content" style="max-width:600px;max-height:80vh;overflow-y:auto;">' +
+                        '<div class="modal-header">' +
+                            '<h3>' + escapeHtml(c.name) + '</h3>' +
+                            '<button onclick="document.getElementById(\'' + modalId + '\').remove();" style="background:none;border:none;font-size:24px;cursor:pointer;">&times;</button>' +
+                        '</div>' +
+                        '<div class="modal-body">' +
+                            '<p><strong>类型：</strong>' + escapeHtml(c.type || '未知') + '</p>' +
+                            '<p><strong>状态：</strong>' + statusText + '</p>' +
+                            '<p><strong>开始时间：</strong>' + (c.startTime || '待定') + '</p>' +
+                            '<p><strong>结束时间：</strong>' + (c.endTime || '待定') + '</p>' +
+                            '<p><strong>报名截止：</strong>' + (c.registerDeadline || '待定') + '</p>' +
+                            '<p><strong>最大团队人数：</strong>' + (c.maxTeamSize || 1) + '</p>' +
+                            '<p><strong>已报名：</strong>' + (c.registered || 0) + '</p>' +
+                            '<p><strong>描述：</strong>' + escapeHtml(c.description || '暂无') + '</p>' +
+                            '<hr style="margin:15px 0;">' +
+                            '<h4>评论</h4>' +
+                            '<div id="commentsList_' + competitionId + '" style="max-height:200px;overflow-y:auto;margin-bottom:10px;"><div style="text-align:center;padding:10px;color:#999;">加载中...</div></div>' +
+                            '<div style="display:flex;gap:8px;">' +
+                                '<input type="text" id="commentInput_' + competitionId + '" placeholder="发表评论..." style="flex:1;padding:8px;border:1px solid #d9d9d9;border-radius:4px;">' +
+                                '<button class="btn btn-primary" onclick="postComment(' + competitionId + ')" style="padding:8px 16px;">评论</button>' +
+                            '</div>' +
+                        '</div>' +
+                    '</div>';
+                document.body.appendChild(modal);
+                modal.style.display = 'flex';
+                modal.onclick = function(e) { if (e.target === modal) modal.remove(); };
+                loadComments(competitionId);
+            } catch(e) { console.error('查看详情失败:', e); }
+        }
+
+        async function loadComments(competitionId) {
+            var list = document.getElementById('commentsList_' + competitionId);
+            if (!list) return;
+            try {
+                var resp = await fetch('/api/comments/competition/' + competitionId);
+                var result = await resp.json();
+                if (result.success && result.data && result.data.length > 0) {
+                    list.innerHTML = result.data.map(function(cm) {
+                        return '<div style="padding:6px 0;border-bottom:1px solid #f0f0f0;">' +
+                            '<strong>' + escapeHtml(cm.username || cm.senderName || '匿名') + '</strong>: ' +
+                            escapeHtml(cm.content) +
+                            '<span style="color:#999;font-size:11px;margin-left:8px;">' + (cm.createTime || '') + '</span>' +
+                            '</div>';
+                    }).join('');
+                } else {
+                    list.innerHTML = '<div style="text-align:center;padding:10px;color:#999;">暂无评论</div>';
+                }
+            } catch(e) { console.error('加载评论失败:', e); }
+        }
+
+        async function postComment(competitionId) {
+            var input = document.getElementById('commentInput_' + competitionId);
+            var content = (input || {}).value;
+            if (!content) { alert('请输入评论内容'); return; }
+            try {
+                var resp = await tapi('/api/comments', {
+                    method: 'POST',
+                    body: JSON.stringify({ competitionId: competitionId, content: content })
+                });
+                var result = await resp.json();
+                if (result.success) {
+                    if (input) input.value = '';
+                    loadComments(competitionId);
+                } else {
+                    alert(result.message || '评论失败');
+                }
+            } catch(e) { console.error('发表评论失败:', e); }
+        }
+
+    </script>
+</body>
+
+</html>

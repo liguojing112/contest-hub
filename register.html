@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>注册账号 - 高校竞赛管理系统</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/antd@5.12.8/dist/reset.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Microsoft YaHei', 'PingFang SC', sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .nav {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: opacity 0.3s;
+        }
+
+        .nav a:hover {
+            opacity: 0.8;
+        }
+
+        .register-section {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            margin: 40px auto;
+            max-width: 500px;
+        }
+
+        .register-title {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #666;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+        }
+
+        .password-input-container {
+            position: relative;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #999;
+        }
+
+        .password-toggle:hover {
+            color: #667eea;
+        }
+
+        .role-selector {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .role-option {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .role-option.active {
+            background-color: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .register-btn {
+            width: 100%;
+            padding: 12px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .register-btn:hover {
+            background: #5a6fe4;
+        }
+
+        .register-footer {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 14px;
+            color: #999;
+        }
+
+        .register-footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .register-footer a:hover {
+            text-decoration: underline;
+        }
+
+        .student-only {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="header">
+        <div class="container header-content">
+            <div class="logo">高校竞赛管理系统</div>
+            <nav class="nav">
+                <a href="index.html">首页</a>
+                <a href="#">竞赛列表</a>
+                <a href="#">关于我们</a>
+                <a href="#">联系我们</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="register-section">
+            <h2 class="register-title">注册账号</h2>
+
+            <div class="role-selector">
+                <div class="role-option active" data-role="student">学生</div>
+                <div class="role-option" data-role="teacher">教师</div>
+            </div>
+
+            <form id="registerForm">
+                <div class="form-group">
+                    <label for="username">账号</label>
+                    <input type="text" id="username" name="username" placeholder="请输入账号（学生输入学号，教师和管理员输入工号）">
+                </div>
+
+                <div class="form-group">
+                    <label for="name">姓名</label>
+                    <input type="text" id="name" name="name" placeholder="请输入姓名">
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">手机号</label>
+                    <input type="tel" id="phone" name="phone" placeholder="请输入手机号码">
+                </div>
+
+                <div class="form-group">
+                    <label for="college">所属学院</label>
+                    <input type="text" id="college" name="college" placeholder="请输入所属学院">
+                </div>
+
+                <div class="form-group student-only">
+                    <label for="major">专业</label>
+                    <input type="text" id="major" name="major" placeholder="请输入专业">
+                </div>
+
+                <div class="form-group student-only">
+                    <label for="className">班级</label>
+                    <input type="text" id="className" name="className" placeholder="请输入班级（如：2021级1班）">
+                </div>
+
+                <div class="form-group">
+                    <label for="email">邮箱</label>
+                    <input type="email" id="email" name="email" placeholder="请输入邮箱">
+                </div>
+
+                <div class="form-group">
+                    <label for="password">密码</label>
+                    <div class="password-input-container">
+                        <input type="password" id="password" name="password" placeholder="请输入密码">
+                        <span class="password-toggle" onclick="togglePassword('password')">👁️</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmPassword">确认密码</label>
+                    <div class="password-input-container">
+                        <input type="password" id="confirmPassword" name="confirmPassword" placeholder="请确认密码">
+                        <span class="password-toggle" onclick="togglePassword('confirmPassword')">👁️</span>
+                    </div>
+                </div>
+
+                <div id="error-message" style="color: red; margin-bottom: 20px; display: none;"></div>
+
+                <button type="submit" class="register-btn">注册</button>
+
+                <div class="register-footer">
+                    已有账号？ <a href="index.html">立即登录</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // 密码显示/隐藏功能
+        function togglePassword(inputId) {
+            const input = document.getElementById(inputId);
+            const toggle = input.nextElementSibling;
+            if (input.type === 'password') {
+                input.type = 'text';
+                toggle.textContent = '🙈';
+            } else {
+                input.type = 'password';
+                toggle.textContent = '👁️';
+            }
+        }
+
+        // 角色选择功能
+        const roleOptions = document.querySelectorAll('.role-option');
+        const studentFields = document.querySelectorAll('.student-only');
+
+        function updateStudentFields() {
+            const selectedRole = document.querySelector('.role-option.active').dataset.role;
+            if (selectedRole === 'student') {
+                studentFields.forEach(field => {
+                    field.style.display = 'block';
+                });
+            } else {
+                studentFields.forEach(field => {
+                    field.style.display = 'none';
+                });
+            }
+        }
+
+        roleOptions.forEach(option => {
+            option.addEventListener('click', function () {
+                roleOptions.forEach(opt => opt.classList.remove('active'));
+                this.classList.add('active');
+                updateStudentFields();
+            });
+        });
+
+        // 初始化时显示学生字段（默认角色是学生）
+        updateStudentFields();
+
+        // 注册表单提交
+        const API_BASE_URL = 'http://localhost:8080/api';
+
+        document.getElementById('registerForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const username = document.getElementById('username').value;
+            const name = document.getElementById('name').value;
+            const phone = document.getElementById('phone').value;
+            const college = document.getElementById('college').value;
+            const major = document.getElementById('major').value;
+            const className = document.getElementById('className').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const role = document.querySelector('.role-option.active').dataset.role;
+            const errorMessage = document.getElementById('error-message');
+
+            if (role === 'admin') {
+                errorMessage.textContent = '系统只允许一个管理员账号';
+                errorMessage.style.display = 'block';
+                return;
+            }
+
+            errorMessage.style.display = 'none';
+            errorMessage.textContent = '';
+
+            if (!username || !name || !phone || !college || !password) {
+                errorMessage.textContent = '请填写所有必填字段';
+                errorMessage.style.display = 'block';
+                return;
+            }
+
+            if (role === 'student' && (!major || !className)) {
+                errorMessage.textContent = '学生角色请填写专业和班级';
+                errorMessage.style.display = 'block';
+                return;
+            }
+
+            const phoneRegex = /^1[3-9]\d{9}$/;
+            if (!phoneRegex.test(phone)) {
+                errorMessage.textContent = '请输入正确的手机号码';
+                errorMessage.style.display = 'block';
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                errorMessage.textContent = '两次输入的密码不一致，请重新输入';
+                errorMessage.style.display = 'block';
+                return;
+            }
+
+            if (username === 'admin' || username === 'Admin' || username === 'ADMIN') {
+                errorMessage.textContent = '不能使用admin作为账号';
+                errorMessage.style.display = 'block';
+                return;
+            }
+
+            const roleMap = { 'admin': 'ADMIN', 'teacher': 'TEACHER', 'student': 'STUDENT' };
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username: username,
+                        password: password,
+                        name: name,
+                        role: roleMap[role] || 'STUDENT',
+                        phone: phone,
+                        college: college,
+                        major: major,
+                        className: className,
+                        email: email
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    window.location.href = 'index.html';
+                } else {
+                    errorMessage.textContent = result.message || '注册失败';
+                    errorMessage.style.display = 'block';
+                }
+            } catch (error) {
+                console.warn('后端不可用，使用本地注册:', error.message);
+
+                try {
+                    let registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '{}');
+                    if (registeredUsers[username]) {
+                        errorMessage.textContent = '此账号已注册，请直接登录';
+                        errorMessage.style.display = 'block';
+                        return;
+                    }
+                    registeredUsers[username] = {
+                        password: password,
+                        name: name,
+                        role: role,
+                        phone: phone,
+                        college: college,
+                        major: major,
+                        className: className,
+                        email: email
+                    };
+                    localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
+                    window.location.href = 'index.html';
+                } catch (e) {
+                    errorMessage.textContent = '注册失败，请重试';
+                    errorMessage.style.display = 'block';
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>
