@@ -9,14 +9,15 @@ echo.
 
 cd /d "%~dp0backend"
 
-if not exist "%~dp0jingsai-1.0.0.jar" (
-    echo [ERROR] jingsai-1.0.0.jar not found!
+if not exist "%~dp0backend\target\jingsai-1.0.0.jar" (
+    echo [ERROR] backend\target\jingsai-1.0.0.jar not found!
+    echo Please build first: cd backend ^&^& mvn clean package -DskipTests
     pause
     exit /b 1
 )
 
 echo Starting server...
-start "Jingsai" java -jar "%~dp0jingsai-1.0.0.jar"
+start "Jingsai" java -jar "%~dp0backend\target\jingsai-1.0.0.jar"
 
 echo Server is starting, please wait...
 echo.
