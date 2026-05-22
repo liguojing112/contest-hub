@@ -16,16 +16,23 @@ if not exist "%~dp0backend\target\jingsai-1.0.0.jar" (
     exit /b 1
 )
 
-echo Starting server...
-start "Jingsai" java -jar "%~dp0backend\target\jingsai-1.0.0.jar"
+echo Checking Java...
+java -version 2>&1
+if %ERRORLEVEL% NEQ 0 (
+    echo [ERROR] Java not found! Please install JDK 17 or later.
+    pause
+    exit /b 1
+)
 
-echo Server is starting, please wait...
 echo.
-echo URL: http://localhost:8080
+echo Starting server...
+echo Log will be saved to app.log
 echo.
-echo Accounts (password: 123456):
-echo   Admin:   admin
-echo   Teacher: T1001
-echo   Student: 1001
+
+java -jar "%~dp0backend\target\jingsai-1.0.0.jar" > app.log 2>&1
+
 echo.
+echo ============================================
+echo Server stopped. Check app.log for errors.
+echo ============================================
 pause
