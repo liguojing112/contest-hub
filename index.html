@@ -892,7 +892,8 @@
                 major: result.user.major || '',
                 className: result.user.className || '',
                 phone: result.user.phone || '',
-                email: result.user.email || ''
+                email: result.user.email || '',
+                avatar: result.user.avatar || ''
               };
               localStorage.setItem('userInfo', JSON.stringify(userInfo));
               Logger.info('用户信息已保存', userInfo);
