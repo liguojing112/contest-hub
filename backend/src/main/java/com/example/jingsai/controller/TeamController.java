@@ -61,9 +61,27 @@ public class TeamController {
         Team team = teamService.getById(id);
         if (team != null) {
             List<TeamMember> members = teamService.getTeamMembers(id);
+            // 为每个成员附加用户名和头像
+            List<Map<String, Object>> enrichedMembers = new ArrayList<>();
+            for (TeamMember m : members) {
+                Map<String, Object> item = new HashMap<>();
+                item.put("id", m.getId());
+                item.put("teamId", m.getTeamId());
+                item.put("userId", m.getUserId());
+                item.put("role", m.getRole());
+                item.put("status", m.getStatus());
+                item.put("joinTime", m.getJoinTime());
+                User user = userMapper.selectById(m.getUserId());
+                if (user != null) {
+                    item.put("name", user.getName());
+                    item.put("username", user.getUsername());
+                    item.put("avatar", user.getAvatar());
+                }
+                enrichedMembers.add(item);
+            }
             Map<String, Object> data = new HashMap<>();
             data.put("team", team);
-            data.put("members", members);
+            data.put("members", enrichedMembers);
             response.put("success", true);
             response.put("data", data);
         } else {

@@ -610,7 +610,10 @@
                 <div class="content-section">
                     <h2 class="section-title">我的竞赛</h2>
 
-                    <button class="btn btn-outline" onclick="exportRegistrations()" style="margin-bottom:10px;">导出报名名单</button>
+                    <button class="btn btn-outline" onclick="exportSelectedRegistrations()" style="margin-bottom:10px;">导出报名名单</button>
+                    <select id="exportCompetitionSelect" style="margin-bottom:10px;margin-left:8px;padding:8px;border:1px solid #d9d9d9;border-radius:4px;">
+                        <option value="">-- 选择竞赛 --</option>
+                    </select>
                     <div class="search-bar">
                         <input type="text" id="searchName" placeholder="搜索竞赛名称">
                         <select id="searchStatus">
@@ -1188,7 +1191,17 @@
                     }
 
                     tbody.innerHTML = '';
+                    var exportSelect = document.getElementById('exportCompetitionSelect');
+                    if (exportSelect) {
+                        exportSelect.innerHTML = '<option value="">-- 选择竞赛 --</option>';
+                    }
                     result.data.forEach((competition) => {
+                        if (exportSelect) {
+                            var opt = document.createElement('option');
+                            opt.value = competition.id;
+                            opt.textContent = competition.name;
+                            exportSelect.appendChild(opt);
+                        }
                         const statusText = getStatusText(competition.status);
                         const statusClass = getStatusClass(competition.status);
 
@@ -1207,6 +1220,7 @@
                         <td>
                             <button class="btn btn-outline" onclick="viewMyCompetitionDetails('${competition.id}')" style="padding:4px 8px;font-size:12px;">查看</button>
                             <button class="btn btn-outline" onclick="editCompetition(${competition.id})" style="padding:4px 8px;font-size:12px;">编辑</button>
+                            <button class="btn btn-outline" onclick="exportRegistrations(${competition.id})" style="padding:4px 8px;font-size:12px;">导出</button>
                             ${['pending','preparing','draft','rejected','ended'].includes(competition.status) ? '<button class="btn btn-outline" onclick="deleteCompetition(' + competition.id + ')" style="padding:4px 8px;font-size:12px;color:#e74c3c;">删除</button>' : ''}
                         </td>
                     `;
@@ -1670,18 +1684,23 @@
             var compId = document.getElementById('assignCompetition').value;
             if (!compId) { document.getElementById('registrationsForAssign').innerHTML = ''; return; }
 
-            var [regResp, pendResp, teacherResp] = await Promise.all([
+            var [regResp, pendResp, teacherResp, userResp] = await Promise.all([
                 tapi('/api/registrations/competition/' + compId).then(r => r.json()),
                 tapi('/api/reviews/pending/' + compId).then(r => r.json()),
-                tapi('/api/auth/teachers').then(r => r.json())
+                tapi('/api/auth/teachers').then(r => r.json()),
+                tapi('/api/admin/users').then(r => r.json())
             ]);
 
             var registrations = regResp.success ? (regResp.data || []) : [];
             var pending = pendResp.success ? (pendResp.data || []) : [];
             var teachers = teacherResp.success ? (teacherResp.data || []) : [];
+            var allUsers = userResp.success ? (userResp.data || []) : [];
 
             var teacherMap = {};
             teachers.forEach(function(t) { teacherMap[t.id] = t.name || t.username; });
+
+            var usersMap = {};
+            allUsers.forEach(function(u) { usersMap[u.id] = u; });
 
             var container = document.getElementById('registrationsForAssign');
             if (registrations.length === 0) {
@@ -1689,10 +1708,11 @@
                 return;
             }
 
-            container.innerHTML = '<table style="width:100%;border-collapse:collapse;"><thead><tr><th>报名ID</th><th>学生</th><th>状态</th><th>已分配评审</th><th>操作</th></tr></thead><tbody>' + registrations.map(function(r) {
+            container.innerHTML = '<table style="width:100%;border-collapse:collapse;"><thead><tr><th>报名</th><th>学生</th><th>状态</th><th>已分配评审</th><th>操作</th></tr></thead><tbody>' + registrations.map(function(r) {
                 var assigned = pending.filter(function(p) { return p.registrationId === r.id; });
                 var assignedNames = assigned.map(function(a) { return teacherMap[a.reviewerId] || ('教师#' + a.reviewerId); }).join(', ');
-                return '<tr><td>' + r.id + '</td><td>' + (r.userId || '-') + '</td><td>' + (r.status || '-') + '</td><td>' + (assignedNames || '<span style="color:#999;">未分配</span>') + '</td><td><button class="btn btn-outline" onclick="manualAssign(' + compId + ',' + r.id + ')" style="padding:4px 8px;font-size:12px;">开始评审</button></td></tr>';
+                var studentName = (usersMap[r.userId] && usersMap[r.userId].name) || (usersMap[r.userId] && usersMap[r.userId].username) || ('#' + r.userId);
+                return '<tr><td>' + r.id + '</td><td>' + studentName + '</td><td>' + (r.status || '-') + '</td><td>' + (assignedNames || '<span style="color:#999;">未分配</span>') + '</td><td><button class="btn btn-outline" onclick="manualAssign(' + compId + ',' + r.id + ')" style="padding:4px 8px;font-size:12px;">开始评审</button></td></tr>';
             }).join('') + '</tbody></table>';
         }
 
@@ -2163,7 +2183,7 @@
                 var container = document.getElementById('reviewNotifications');
                 if (resp.success && resp.data && resp.data.length > 0) {
                     container.innerHTML = resp.data.map(function(c) {
-                        return '<div style="padding:8px 12px;background:#e8f5e9;border-radius:4px;margin-bottom:8px;">竞赛: ' + escapeHtml(c.name) + ' - ID: ' + c.id + ' <button class="btn btn-primary" style="padding:4px 8px;font-size:12px;" onclick="switchPage(\'review\')">去评审</button></div>';
+                        return '<div style="padding:8px 12px;background:#e8f5e9;border-radius:4px;margin-bottom:8px;">竞赛: ' + escapeHtml(c.name) + ' - 创建者: ' + escapeHtml(c.creator || '未知') + ' <button class="btn btn-primary" style="padding:4px 8px;font-size:12px;" onclick="switchPage(\'review\')">去评审</button></div>';
                     }).join('');
                 } else {
                     container.innerHTML = '<div style="text-align:center;padding:20px;color:#999;">暂无评审任务</div>';
@@ -2710,10 +2730,18 @@
             return d.toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
         }
 
-        function exportRegistrations() {
-            var competitionId = prompt('请输入要导出报名的竞赛ID:');
+        function exportRegistrations(competitionId) {
             if (!competitionId) return;
             window.open('/api/registrations/export/' + competitionId, '_blank');
+        }
+
+        function exportSelectedRegistrations() {
+            var select = document.getElementById('exportCompetitionSelect');
+            if (!select || !select.value) {
+                alert('请先在下拉框中选择一个竞赛');
+                return;
+            }
+            window.open('/api/registrations/export/' + select.value, '_blank');
         }
 
         function getSelectedReviewers() {
@@ -2935,6 +2963,51 @@
             } catch(e) { console.error('查看详情失败:', e); }
         }
 
+        function renderTeacherComment(c) {
+            var repliesHtml = (c.replies && c.replies.length > 0)
+                ? '<div style="margin-top:6px;padding-left:16px;border-left:2px solid #e8e8e8;">' + c.replies.map(function(r) {
+                    return '<div style="padding:4px 0;border-bottom:1px solid #f5f5f5;"><strong>' + escapeHtml(r.userName) + '</strong> <span style="color:#999;font-size:11px;">' + (r.createTime || '') + '</span><p style="margin:3px 0;">' + escapeHtml(r.content) + '</p></div>';
+                }).join('') + '</div>'
+                : '';
+            return '<div style="padding:6px 0;border-bottom:1px solid #f0f0f0;">' +
+                '<strong>' + escapeHtml(c.userName) + '</strong>: ' + escapeHtml(c.content) +
+                '<span style="color:#999;font-size:11px;margin-left:8px;">' + (c.createTime || '') + '</span>' +
+                '<button class="btn btn-outline" style="font-size:10px;padding:1px 6px;margin-left:8px;" onclick="showTeacherReplyForm(' + c.id + ', ' + c.competitionId + ')">回复</button>' +
+                repliesHtml +
+                '<div id="teacherReplyForm_' + c.id + '" style="display:none;margin-top:4px;padding-left:16px;"></div>' +
+                '</div>';
+        }
+
+        function showTeacherReplyForm(commentId, competitionId) {
+            var formDiv = document.getElementById('teacherReplyForm_' + commentId);
+            if (!formDiv) return;
+            var isVisible = formDiv.style.display !== 'none';
+            if (isVisible) {
+                formDiv.style.display = 'none';
+                return;
+            }
+            formDiv.style.display = 'block';
+            formDiv.innerHTML = '<div style="display:flex;gap:4px;">' +
+                '<input type="text" id="teacherReplyContent_' + commentId + '" placeholder="写下回复..." style="flex:1;padding:6px;border:1px solid #ddd;border-radius:4px;font-size:12px;">' +
+                '<button class="btn btn-primary" style="font-size:11px;padding:4px 10px;" onclick="postTeacherReply(' + competitionId + ', ' + commentId + ')">回复</button>' +
+                '<button class="btn btn-outline" style="font-size:11px;padding:4px 10px;" onclick="document.getElementById(\'teacherReplyForm_' + commentId + '\').style.display=\'none\'">取消</button>' +
+                '</div>';
+        }
+
+        async function postTeacherReply(competitionId, parentId) {
+            var content = document.getElementById('teacherReplyContent_' + parentId).value.trim();
+            if (!content) { alert('请输入回复内容'); return; }
+            try {
+                var resp = await tapi('/api/comments', { method: 'POST', body: JSON.stringify({ competitionId: competitionId, content: content, parentId: parentId }) });
+                var result = await resp.json();
+                if (result.success) {
+                    loadComments(competitionId);
+                } else {
+                    alert(result.message || '回复失败');
+                }
+            } catch(e) { console.error('回复失败:', e); }
+        }
+
         async function loadComments(competitionId) {
             var list = document.getElementById('commentsList_' + competitionId);
             if (!list) return;
@@ -2943,11 +3016,7 @@
                 var result = await resp.json();
                 if (result.success && result.data && result.data.length > 0) {
                     list.innerHTML = result.data.map(function(cm) {
-                        return '<div style="padding:6px 0;border-bottom:1px solid #f0f0f0;">' +
-                            '<strong>' + escapeHtml(cm.username || cm.senderName || '匿名') + '</strong>: ' +
-                            escapeHtml(cm.content) +
-                            '<span style="color:#999;font-size:11px;margin-left:8px;">' + (cm.createTime || '') + '</span>' +
-                            '</div>';
+                        return renderTeacherComment(cm);
                     }).join('');
                 } else {
                     list.innerHTML = '<div style="text-align:center;padding:10px;color:#999;">暂无评论</div>';

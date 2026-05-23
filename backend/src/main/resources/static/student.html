@@ -967,13 +967,16 @@
                             '<p style="margin-bottom: 15px; color: #666; font-size: 14px;"><strong>团队宣言：</strong>' + (t.declaration || '暂无') + '</p>' +
                             '<ul class="member-list">' +
                                 (members.length > 0 ? members.map(function(m) {
-                                    var memberName = m.userName || m.username || '未知';
+                                    var memberName = m.name || m.username || '未知';
+                                    var avatarHtml = m.avatar
+                                        ? '<img src="' + m.avatar + '" alt="' + memberName + '" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">'
+                                        : '<div class="member-avatar">' + (memberName.charAt(0)) + '</div>';
                                     return '<li class="member-item">' +
                                         '<div class="member-info">' +
-                                            '<div class="member-avatar">' + (memberName.charAt(0)) + '</div>' +
+                                            avatarHtml +
                                             '<div>' +
                                                 '<div>' + escapeHtml(memberName) + '</div>' +
-                                                '<div class="member-role">' + (m.role === 'leader' ? '队长' : '队员') + ' · ' + (m.username || '') + '</div>' +
+                                                '<div class="member-role">' + (m.role === 'leader' ? '队长' : '队员') + (m.username ? ' · ' + m.username : '') + '</div>' +
                                             '</div>' +
                                         '</div>' +
                                         '<span style="color:' + (m.role === 'leader' ? '#667eea' : '#666') + ';">' + (m.role === 'leader' ? '队长' : '队员') + '</span>' +
@@ -1758,11 +1761,56 @@ function escapeHtml(text) {
                         container.innerHTML = '<div style="color:#999;padding:10px;">暂无评论</div>';
                     } else {
                         container.innerHTML = result.data.map(function(c) {
-                            return '<div style="padding:8px 0;border-bottom:1px solid #f0f0f0;"><strong>' + escapeHtml(c.userName) + '</strong> <span style="color:#999;font-size:12px;">' + (c.createTime || '') + '</span><p style="margin-top:4px;">' + escapeHtml(c.content) + '</p></div>';
+                            return renderComment(c);
                         }).join('');
                     }
                 }
             } catch(e) { console.error('加载评论失败:', e); }
+        }
+
+        function renderComment(c) {
+            var repliesHtml = (c.replies && c.replies.length > 0)
+                ? '<div style="margin-top:8px;padding-left:20px;border-left:2px solid #e8e8e8;">' + c.replies.map(function(r) {
+                    return '<div style="padding:6px 0;border-bottom:1px solid #f5f5f5;"><strong>' + escapeHtml(r.userName) + '</strong> <span style="color:#999;font-size:11px;">' + (r.createTime || '') + '</span><p style="margin:4px 0;">' + escapeHtml(r.content) + '</p></div>';
+                }).join('') + '</div>'
+                : '';
+            return '<div style="padding:8px 0;border-bottom:1px solid #f0f0f0;">' +
+                '<strong>' + escapeHtml(c.userName) + '</strong> <span style="color:#999;font-size:12px;">' + (c.createTime || '') + '</span>' +
+                '<p style="margin:4px 0;">' + escapeHtml(c.content) + '</p>' +
+                '<button class="btn btn-outline" style="font-size:11px;padding:2px 8px;" onclick="showReplyForm(' + c.id + ', ' + c.competitionId + ')">回复</button>' +
+                repliesHtml +
+                '<div id="replyForm_' + c.id + '" style="display:none;margin-top:6px;padding-left:20px;"></div>' +
+                '</div>';
+        }
+
+        function showReplyForm(commentId, competitionId) {
+            var formDiv = document.getElementById('replyForm_' + commentId);
+            if (!formDiv) return;
+            var isVisible = formDiv.style.display !== 'none';
+            if (isVisible) {
+                formDiv.style.display = 'none';
+                return;
+            }
+            formDiv.style.display = 'block';
+            formDiv.innerHTML = '<textarea id="replyContent_' + commentId + '" placeholder="写下你的回复..." style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;min-height:50px;"></textarea>' +
+                '<div style="margin-top:4px;">' +
+                '<button class="btn btn-primary" style="font-size:12px;padding:4px 12px;" onclick="postReply(' + competitionId + ', ' + commentId + ')">回复</button>' +
+                '<button class="btn btn-outline" style="font-size:12px;padding:4px 12px;margin-left:4px;" onclick="document.getElementById(\'replyForm_' + commentId + '\').style.display=\'none\'">取消</button>' +
+                '</div>';
+        }
+
+        async function postReply(competitionId, parentId) {
+            var content = document.getElementById('replyContent_' + parentId).value.trim();
+            if (!content) { alert('请输入回复内容'); return; }
+            try {
+                var resp = await sapi('/api/comments', { method: 'POST', body: JSON.stringify({ competitionId: competitionId, content: content, parentId: parentId }) });
+                var result = await resp.json();
+                if (result.success) {
+                    loadComments(competitionId);
+                } else {
+                    alert(result.message || '回复失败');
+                }
+            } catch(e) { console.error('回复失败:', e); }
         }
 
         async function postComment(competitionId) {

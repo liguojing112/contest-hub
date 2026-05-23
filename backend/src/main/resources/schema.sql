@@ -115,6 +115,7 @@ CREATE TABLE IF NOT EXISTS comment (
     user_id BIGINT NOT NULL,
     user_name VARCHAR(50),
     content TEXT NOT NULL,
+    parent_id BIGINT DEFAULT NULL,
     create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

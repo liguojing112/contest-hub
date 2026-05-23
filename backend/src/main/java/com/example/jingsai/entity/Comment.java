@@ -18,5 +18,6 @@ public class Comment {
     private Long userId;
     private String userName;
     private String content;
+    private Long parentId;
     private LocalDateTime createTime;
 }

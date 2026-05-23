@@ -693,7 +693,7 @@
                 <div class="content-section">
                     <h2 class="section-title">申诉处理</h2>
                     <div class="table-container">
-                        <table><thead><tr><th>ID</th><th>学生ID</th><th>报名ID</th><th>内容</th><th>状态</th><th>回复</th><th>操作</th></tr></thead>
+                        <table><thead><tr><th>学生</th><th>报名</th><th>内容</th><th>状态</th><th>回复</th><th>操作</th></tr></thead>
                         <tbody id="appealTableBody"></tbody></table>
                     </div>
                 </div>
@@ -734,19 +734,19 @@
                     <h2 class="section-title">数据管理</h2>
 
                     <div class="stats-grid">
-                        <div class="stat-card">
+                        <div class="stat-card" data-stat-type="competitions">
                             <div class="stat-number" id="statCompCount">-</div>
                             <div class="stat-label">竞赛总数</div>
                         </div>
-                        <div class="stat-card">
+                        <div class="stat-card" data-stat-type="students">
                             <div class="stat-number" id="statStuCount">-</div>
                             <div class="stat-label">学生总数</div>
                         </div>
-                        <div class="stat-card">
+                        <div class="stat-card" data-stat-type="teachers">
                             <div class="stat-number" id="statTeaCount">-</div>
                             <div class="stat-label">教师总数</div>
                         </div>
-                        <div class="stat-card">
+                        <div class="stat-card" data-stat-type="registrations">
                             <div class="stat-number" id="statRegCount">-</div>
                             <div class="stat-label">总报名数</div>
                         </div>
@@ -1053,11 +1053,11 @@ const menuItems = document.querySelectorAll('.sidebar-menu a[data-page]');
                 // 检查是否是数据分析页面的卡片
                 if (this.closest('#page-analytics')) {
                     // 数据分析页面的卡片点击逻辑
-                    const statLabel = this.querySelector('.stat-label').textContent;
+                    const statType = this.getAttribute('data-stat-type');
                     const statNumber = this.querySelector('.stat-number').textContent;
 
                     // 显示详细信息
-                    showAnalyticsDetail(statLabel, statNumber);
+                    showAnalyticsDetail(statType, statNumber, this.querySelector('.stat-label').textContent.trim());
                 } else {
                     // 仪表盘页面的卡片点击逻辑
                     let targetPage = '';
@@ -1105,64 +1105,30 @@ const menuItems = document.querySelectorAll('.sidebar-menu a[data-page]');
         });
 
         // 显示数据分析详细信息
-        function showAnalyticsDetail(label, number) {
+        function showAnalyticsDetail(statType, number, label) {
             // 创建详细信息模态框
             let modal = document.getElementById('analyticsModal');
             if (!modal) {
                 modal = document.createElement('div');
                 modal.id = 'analyticsModal';
-                modal.style.cssText = `
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
-                    background: rgba(0, 0, 0, 0.5);
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    z-index: 1000;
-                `;
+                modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:1000;';
 
-                const modalContent = document.createElement('div');
-                modalContent.style.cssText = `
-                    background: white;
-                    padding: 30px;
-                    border-radius: 8px;
-                    width: 80%;
-                    max-width: 600px;
-                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-                `;
+                var modalContent = document.createElement('div');
+                modalContent.style.cssText = 'background:white;padding:30px;border-radius:8px;width:80%;max-width:600px;box-shadow:0 4px 12px rgba(0,0,0,0.15);';
 
-                const modalHeader = document.createElement('div');
-                modalHeader.style.cssText = `
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    margin-bottom: 20px;
-                `;
+                var modalHeader = document.createElement('div');
+                modalHeader.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;';
 
-                const modalTitle = document.createElement('h3');
+                var modalTitle = document.createElement('h3');
                 modalTitle.id = 'modalTitle';
-                modalTitle.style.cssText = `
-                    margin: 0;
-                    color: #333;
-                `;
+                modalTitle.style.cssText = 'margin:0;color:#333;';
 
-                const closeButton = document.createElement('button');
+                var closeButton = document.createElement('button');
                 closeButton.textContent = '×';
-                closeButton.style.cssText = `
-                    background: none;
-                    border: none;
-                    font-size: 24px;
-                    cursor: pointer;
-                    color: #999;
-                `;
-                closeButton.addEventListener('click', function () {
-                    modal.style.display = 'none';
-                });
+                closeButton.style.cssText = 'background:none;border:none;font-size:24px;cursor:pointer;color:#999;';
+                closeButton.onclick = function() { modal.style.display = 'none'; };
 
-                const modalBody = document.createElement('div');
+                var modalBody = document.createElement('div');
                 modalBody.id = 'modalBody';
 
                 modalHeader.appendChild(modalTitle);
@@ -1171,16 +1137,55 @@ const menuItems = document.querySelectorAll('.sidebar-menu a[data-page]');
                 modalContent.appendChild(modalBody);
                 modal.appendChild(modalContent);
                 document.body.appendChild(modal);
+
+                modal.onclick = function(e) { if (e.target === modal) modal.style.display = 'none'; };
             }
 
             // 设置模态框内容
+            label = label || statType;
             document.getElementById('modalTitle').textContent = label + ' 详情';
 
-            var comps = window._allCompetitions || [];            var collegeStats = window._collegeStats || {};            switch (label) {                case '竞赛总数': {                    var typeCounts = {};                    comps.forEach(function(c) { var t = c.type || '其他'; typeCounts[t] = (typeCounts[t] || 0) + 1; });                    var typeHtml = Object.keys(typeCounts).map(function(t) {                        return '<div style="flex: 1; min-width: 150px; padding: 15px; background: #f9f9f9; border-radius: 4px;"><div style="font-weight: bold;">' + t + '</div><div style="color: #667eea;">' + typeCounts[t] + '</div></div>';                    }).join('');                    detailContent = '<div style="text-align: center; margin: 20px 0;"><div style="font-size: 48px; font-weight: bold; color: #667eea;">' + number + '</div><div style="font-size: 18px; color: #666; margin-top: 10px;">总竞赛数量</div></div><div style="margin-top: 30px;"><h4 style="margin-bottom: 15px; color: #333;">竞赛类型分布</h4><div style="display: flex; flex-wrap: wrap; gap: 10px;">' + (typeHtml || '<div style="color:#999;">暂无数据</div>') + '</div></div>';                    break;                }                case '参与学生':                    detailContent = '<div style="text-align: center; margin: 20px 0;"><div style="font-size: 48px; font-weight: bold; color: #667eea;">' + number + '</div><div style="font-size: 18px; color: #666; margin-top: 10px;">总参与学生数</div></div><div style="margin-top: 30px;"><h4 style="margin-bottom: 15px; color: #333;">学院参赛人数</h4><div style="display: flex; flex-wrap: wrap; gap: 10px;">' + (Object.keys(collegeStats).map(function(k) { return '<div style="flex: 1; min-width: 150px; padding: 15px; background: #f9f9f9; border-radius: 4px;"><div style="font-weight: bold;">' + k + '</div><div style="color: #667eea;">' + collegeStats[k] + '</div></div>'; }).join('') || '<div style="color:#999;">暂无数据</div>') + '</div></div>';                    break;                case '指导教师':                    detailContent = '<div style="text-align: center; margin: 20px 0;"><div style="font-size: 48px; font-weight: bold; color: #667eea;">' + number + '</div><div style="font-size: 18px; color: #666; margin-top: 10px;">总指导教师数</div></div><div style="margin-top: 30px;"><h4 style="margin-bottom: 15px; color: #333;">竞赛分配情况</h4><div style="padding: 15px; background: #f9f9f9; border-radius: 4px;">' + comps.filter(function(c) { return c.advisorId; }).length + ' 个竞赛已分配指导教师</div></div>';                    break;                case '总报名数':                    detailContent = '<div style="text-align: center; margin: 20px 0;"><div style="font-size: 48px; font-weight: bold; color: #667eea;">' + number + '</div><div style="font-size: 18px; color: #666; margin-top: 10px;">总报名数</div></div><div style="margin-top: 30px;"><h4 style="margin-bottom: 15px; color: #333;">各竞赛报名情况</h4><div style="display: flex; flex-wrap: wrap; gap: 10px;">' + comps.map(function(c) { return '<div style="flex: 1; min-width: 200px; padding: 15px; background: #f9f9f9; border-radius: 4px;"><div style="font-weight: bold;">' + c.name + '</div><div style="color: #667eea;">报名人数: ' + (c.registered || 0) + '</div></div>'; }).join('') + '</div></div>';                    break;            }
+            var raw = window._allCompetitions || [];
+            var comps = Array.isArray(raw) ? raw : (raw.content || []);
+            var collegeStats = window._collegeStats || {};
+            var detailContent = '';
+            switch (statType) {
+                case 'competitions':
+                    var typeCounts = {};
+                    comps.forEach(function(c) { var t = c.type || '其他'; typeCounts[t] = (typeCounts[t] || 0) + 1; });
+                    var typeHtml = Object.keys(typeCounts).map(function(t) {
+                        return '<div style="flex:1;min-width:150px;padding:15px;background:#f9f9f9;border-radius:4px;"><div style="font-weight:bold;">' + t + '</div><div style="color:#667eea;">' + typeCounts[t] + '</div></div>';
+                    }).join('');
+                    detailContent = '<div style="text-align:center;margin:20px 0;"><div style="font-size:48px;font-weight:bold;color:#667eea;">' + number + '</div><div style="font-size:18px;color:#666;margin-top:10px;">总竞赛数量</div></div><div style="margin-top:30px;"><h4 style="margin-bottom:15px;color:#333;">竞赛类型分布</h4><div style="display:flex;flex-wrap:wrap;gap:10px;">' + (typeHtml || '<div style="color:#999;">暂无数据</div>') + '</div></div>';
+                    break;
+                case 'students':
+                    var collegeHtml = Object.keys(collegeStats).map(function(k) {
+                        return '<div style="flex:1;min-width:150px;padding:15px;background:#f9f9f9;border-radius:4px;"><div style="font-weight:bold;">' + k + '</div><div style="color:#667eea;">' + collegeStats[k] + '</div></div>';
+                    }).join('');
+                    detailContent = '<div style="text-align:center;margin:20px 0;"><div style="font-size:48px;font-weight:bold;color:#667eea;">' + number + '</div><div style="font-size:18px;color:#666;margin-top:10px;">总学生数</div></div><div style="margin-top:30px;"><h4 style="margin-bottom:15px;color:#333;">学院参赛人数</h4><div style="display:flex;flex-wrap:wrap;gap:10px;">' + (collegeHtml || '<div style="color:#999;">暂无数据</div>') + '</div></div>';
+                    break;
+                case 'teachers':
+                    var teachers = window._allTeachers || [];
+                    var advisingCount = comps.filter(function(c) { return c.advisorId; }).length;
+                    var teacherRows = teachers.map(function(t) {
+                        var advised = comps.filter(function(c) { return c.advisorId === t.id; });
+                        var advisedNames = advised.map(function(c) { return c.name; }).join('、') || '暂无';
+                        return '<tr><td style="padding:8px 12px;border-bottom:1px solid #f0f0f0;">' + (t.name || t.username) + '</td><td style="padding:8px 12px;border-bottom:1px solid #f0f0f0;">' + (t.college || '-') + '</td><td style="padding:8px 12px;border-bottom:1px solid #f0f0f0;">' + advised.length + ' 个</td><td style="padding:8px 12px;border-bottom:1px solid #f0f0f0;font-size:13px;color:#666;">' + advisedNames + '</td></tr>';
+                    }).join('');
+                    detailContent = '<div style="text-align:center;margin:20px 0;"><div style="font-size:48px;font-weight:bold;color:#667eea;">' + number + '</div><div style="font-size:18px;color:#666;margin-top:10px;">总教师数</div></div><div style="margin-top:30px;"><h4 style="margin-bottom:15px;color:#333;">教师列表及指导情况</h4>' + (teachers.length > 0 ? '<table style="width:100%;border-collapse:collapse;"><thead><tr style="background:#f5f5f5;"><th style="padding:8px 12px;text-align:left;">姓名</th><th style="padding:8px 12px;text-align:left;">学院</th><th style="padding:8px 12px;text-align:left;">指导竞赛数</th><th style="padding:8px 12px;text-align:left;">指导竞赛</th></tr></thead><tbody>' + teacherRows + '</tbody></table>' : '<div style="color:#999;">暂无教师数据</div>') + '</div>';
+                    break;
+                case 'registrations':
+                    var regHtml = comps.map(function(c) {
+                        return '<div style="flex:1;min-width:200px;padding:15px;background:#f9f9f9;border-radius:4px;"><div style="font-weight:bold;">' + c.name + '</div><div style="color:#667eea;">报名人数: ' + (c.registered || 0) + '</div></div>';
+                    }).join('');
+                    detailContent = '<div style="text-align:center;margin:20px 0;"><div style="font-size:48px;font-weight:bold;color:#667eea;">' + number + '</div><div style="font-size:18px;color:#666;margin-top:10px;">总报名数</div></div><div style="margin-top:30px;"><h4 style="margin-bottom:15px;color:#333;">各竞赛报名情况</h4><div style="display:flex;flex-wrap:wrap;gap:10px;">' + (regHtml || '<div style="color:#999;">暂无数据</div>') + '</div></div>';
+                    break;
+                default:
+                    detailContent = '<div style="text-align:center;margin:20px 0;"><div style="font-size:48px;font-weight:bold;color:#667eea;">' + number + '</div><div style="font-size:18px;color:#666;margin-top:10px;">' + label + '</div></div>';
+                    break;
+            }
 
             document.getElementById('modalBody').innerHTML = detailContent;
-
-            // 显示模态框
             modal.style.display = 'flex';
         }
 
@@ -1331,11 +1336,114 @@ const menuItems = document.querySelectorAll('.sidebar-menu a[data-page]');
                 .then(function(result) {
                     if (!result.success || !result.data) { alert('获取竞赛详情失败'); return; }
                     var c = result.data;
-                    alert('竞赛详情:\n\n名称: ' + c.name + '\n类型: ' + c.type + '\n状态: ' + c.status +
-                        '\n开始: ' + formatDate(c.startTime) + '\n结束: ' + formatDate(c.endTime) +
-                        '\n报名截止: ' + formatDate(c.registerDeadline) + '\n报名人数: ' + (c.registered || 0));
+                    var modal = document.createElement('div');
+                    modal.className = 'modal';
+                    var modalId = 'comp_detail_' + Date.now();
+                    modal.id = modalId;
+                    modal.innerHTML =
+                        '<div class="modal-content" style="max-width:600px;">' +
+                            '<div class="modal-header">' +
+                                '<h3>' + escapeHtml(c.name) + '</h3>' +
+                                '<button onclick="document.getElementById(\'' + modalId + '\').remove();" style="background:none;border:none;font-size:24px;cursor:pointer;">&times;</button>' +
+                            '</div>' +
+                            '<div class="modal-body">' +
+                                '<div class="detail-row"><span class="detail-label">类型：</span><span class="detail-value">' + (c.type || '未知') + '</span></div>' +
+                                '<div class="detail-row"><span class="detail-label">状态：</span><span class="detail-value">' + (c.status || '未知') + '</span></div>' +
+                                '<div class="detail-row"><span class="detail-label">开始时间：</span><span class="detail-value">' + formatDate(c.startTime) + '</span></div>' +
+                                '<div class="detail-row"><span class="detail-label">结束时间：</span><span class="detail-value">' + formatDate(c.endTime) + '</span></div>' +
+                                '<div class="detail-row"><span class="detail-label">报名截止：</span><span class="detail-value">' + formatDate(c.registerDeadline) + '</span></div>' +
+                                '<div class="detail-row"><span class="detail-label">报名人数：</span><span class="detail-value">' + (c.registered || 0) + '</span></div>' +
+                                '<hr style="margin:12px 0;">' +
+                                '<h4>评论</h4>' +
+                                '<div id="adminCommentsList_' + modalId + '" style="max-height:200px;overflow-y:auto;margin-bottom:8px;"><div style="text-align:center;padding:10px;color:#999;">加载中...</div></div>' +
+                                '<div style="display:flex;gap:6px;">' +
+                                    '<input type="text" id="adminCommentInput_' + modalId + '" placeholder="发表评论..." style="flex:1;padding:8px;border:1px solid #d9d9d9;border-radius:4px;">' +
+                                    '<button class="btn btn-primary" onclick="adminPostComment(\'' + modalId + '\', ' + c.id + ')" style="padding:8px 16px;">评论</button>' +
+                                '</div>' +
+                            '</div>' +
+                        '</div>';
+                    document.body.appendChild(modal);
+                    modal.style.display = 'flex';
+                    modal.onclick = function(e) { if (e.target === modal) modal.remove(); };
+                    loadAdminComments(modalId, c.id);
                 })
                 .catch(function(e) { console.error('查看竞赛失败:', e); });
+        }
+
+        async function loadAdminComments(modalId, competitionId) {
+            var list = document.getElementById('adminCommentsList_' + modalId);
+            if (!list) return;
+            try {
+                var resp = await fetch('/api/comments/competition/' + competitionId);
+                var result = await resp.json();
+                if (result.success && result.data && result.data.length > 0) {
+                    list.innerHTML = result.data.map(function(cm) {
+                        return renderAdminComment(cm, modalId);
+                    }).join('');
+                } else {
+                    list.innerHTML = '<div style="text-align:center;padding:10px;color:#999;">暂无评论</div>';
+                }
+            } catch(e) { console.error('加载评论失败:', e); }
+        }
+
+        function renderAdminComment(c, modalId) {
+            var repliesHtml = (c.replies && c.replies.length > 0)
+                ? '<div style="margin-top:6px;padding-left:16px;border-left:2px solid #e8e8e8;">' + c.replies.map(function(r) {
+                    return '<div style="padding:4px 0;border-bottom:1px solid #f5f5f5;"><strong>' + escapeHtml(r.userName) + '</strong> <span style="color:#999;font-size:11px;">' + (r.createTime || '') + '</span><p style="margin:3px 0;">' + escapeHtml(r.content) + '</p></div>';
+                }).join('') + '</div>'
+                : '';
+            return '<div style="padding:6px 0;border-bottom:1px solid #f0f0f0;">' +
+                '<strong>' + escapeHtml(c.userName) + '</strong>: ' + escapeHtml(c.content) +
+                '<span style="color:#999;font-size:11px;margin-left:8px;">' + (c.createTime || '') + '</span>' +
+                '<button class="btn btn-outline" style="font-size:10px;padding:1px 6px;margin-left:8px;" onclick="showAdminReplyForm(\'' + modalId + '\', ' + c.id + ', ' + c.competitionId + ')">回复</button>' +
+                repliesHtml +
+                '<div id="adminReplyForm_' + c.id + '" style="display:none;margin-top:4px;padding-left:16px;"></div>' +
+                '</div>';
+        }
+
+        function showAdminReplyForm(modalId, commentId, competitionId) {
+            var formDiv = document.getElementById('adminReplyForm_' + commentId);
+            if (!formDiv) return;
+            if (formDiv.style.display !== 'none') { formDiv.style.display = 'none'; return; }
+            formDiv.style.display = 'block';
+            formDiv.innerHTML = '<div style="display:flex;gap:4px;">' +
+                '<input type="text" id="adminReplyContent_' + commentId + '" placeholder="写下回复..." style="flex:1;padding:6px;border:1px solid #ddd;border-radius:4px;font-size:12px;">' +
+                '<button class="btn btn-primary" style="font-size:11px;padding:4px 10px;" onclick="adminPostReply(\'' + modalId + '\', ' + competitionId + ', ' + commentId + ')">回复</button>' +
+                '<button class="btn btn-outline" style="font-size:11px;padding:4px 10px;" onclick="document.getElementById(\'adminReplyForm_' + commentId + '\').style.display=\'none\'">取消</button>' +
+                '</div>';
+        }
+
+        async function adminPostReply(modalId, competitionId, parentId) {
+            var content = document.getElementById('adminReplyContent_' + parentId).value.trim();
+            if (!content) { alert('请输入回复内容'); return; }
+            try {
+                var resp = await fetch('/api/comments', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (localStorage.getItem('token') || '') },
+                    body: JSON.stringify({ competitionId: competitionId, content: content, parentId: parentId })
+                });
+                var result = await resp.json();
+                if (result.success) { loadAdminComments(modalId, competitionId); }
+                else { alert(result.message || '回复失败'); }
+            } catch(e) { console.error('回复失败:', e); }
+        }
+
+        async function adminPostComment(modalId, competitionId) {
+            var input = document.getElementById('adminCommentInput_' + modalId);
+            var content = (input || {}).value;
+            if (!content) { alert('请输入评论内容'); return; }
+            try {
+                var resp = await fetch('/api/comments', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (localStorage.getItem('token') || '') },
+                    body: JSON.stringify({ competitionId: competitionId, content: content })
+                });
+                var result = await resp.json();
+                if (result.success) {
+                    if (input) input.value = '';
+                    loadAdminComments(modalId, competitionId);
+                } else { alert(result.message || '评论失败'); }
+            } catch(e) { console.error('发表评论失败:', e); }
         }
 
         function updateAdminCompStatus(compId, status, row) {
@@ -1806,6 +1914,18 @@ const menuItems = document.querySelectorAll('.sidebar-menu a[data-page]');
                     window._dashboardStats = d.data;
                 })
                 .catch(function(e) { console.error('加载分析统计失败:', e); });
+
+            // 加载教师列表
+            fetch('/api/admin/users?role=teacher', {
+                headers: { 'Authorization': 'Bearer ' + token }
+            })
+                .then(function(r) { return r.json(); })
+                .then(function(d) {
+                    if (d.success && d.data) {
+                        window._allTeachers = d.data;
+                    }
+                })
+                .catch(function(e) { console.error('加载教师列表失败:', e); });
         }
 
         function initCharts() {
@@ -1863,7 +1983,7 @@ const menuItems = document.querySelectorAll('.sidebar-menu a[data-page]');
                 .then(function(r) { return r.json(); })
                 .then(function(d) {
                     if (!d.success || !d.data) return;
-                    window._allCompetitions = d.data;
+                    window._allCompetitions = d.data.content || d.data;
                     var comps = d.data.content || d.data || [];
                     if (comps.length === 0) return;
 
@@ -2612,8 +2732,11 @@ const menuItems = document.querySelectorAll('.sidebar-menu a[data-page]');
         // 强制更新统计数据
         function forceUpdateStatistics() {
             console.log('强制更新统计数据...');
-            updateStatistics();
-            loadPendingItems();
+            // 刷新分析页统计卡片
+            loadAnalyticsStats();
+            // 重新加载图表数据
+            chartsLoaded = false;
+            initCharts();
 
             // 显示更新成功提示
             const feedbackElement = document.createElement('div');
@@ -2764,12 +2887,21 @@ const menuItems = document.querySelectorAll('.sidebar-menu a[data-page]');
         }
 
         function loadAppeals() {
+            // 确保用户列表已加载（用于学生姓名解析）
+            if (!window._allUsers) {
+                fetch('/api/admin/users', {
+                    headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('token') || '') }
+                }).then(function(r) { return r.json(); }).then(function(d) {
+                    if (d.success && d.data) { window._allUsers = d.data; }
+                });
+            }
             api('/api/appeals/pending').then(function(r) { return r.json(); }).then(function(data) {
                 var tbody = document.getElementById('appealTableBody');
                 if (!data.success || !data.data) return;
                 tbody.innerHTML = data.data.map(function(a) {
                     var statusText = a.status === 'pending' ? '待处理' : a.status === 'resolved' ? '已处理' : a.status;
-                    return '<tr><td>' + a.id + '</td><td>' + a.studentId + '</td><td>' + a.registrationId + '</td>' +
+                    var studentName = ((window._allUsers || []).find(function(u) { return u.id === a.studentId; }) || {}).name || (a.studentId || '-');
+                    return '<tr><td>' + studentName + '</td><td>' + (a.registrationId || '-') + '</td>' +
                         '<td>' + (a.content || '') + '</td><td>' + statusText + '</td><td>' + (a.reply || '') + '</td>' +
                         '<td>' + (a.status === 'pending' ? '<button class="btn btn-primary" onclick="handleAppeal(' + a.id + ')">处理</button>' : '') + '</td></tr>';
                 }).join('');
@@ -2938,7 +3070,7 @@ async function uploadAvatar() {
                 var resp = await fetch('/api/admin/users', { headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('token') || '') } }).then(r => r.json());
                 var select = document.getElementById('adminMsgRecipient');
                 if (select && resp.success && resp.data) {
-                    select.innerHTML = '<option value="">请选择用户</option>' + resp.data.map(function(u) { return '<option value="' + u.id + '">' + escapeHtml(u.name || u.username) + ' (' + escapeHtml(u.username) + ')</option>'; }).join('');
+                    select.innerHTML = '<option value="">请选择用户</option>' + resp.data.map(function(u) { return '<option value="' + u.id + '">' + escapeHtml(u.name || u.username) + ' (' + escapeHtml(u.username) + ')</option>'; }).join(''); window._allUsers = resp.data;
                 }
             } catch(e) { console.error(e); }
         }
@@ -2975,11 +3107,10 @@ async function uploadAvatar() {
                 var typeMap = { system: '系统消息', competition: '竞赛通知', personal: '个人消息', team: '团队消息' };
                 var statusMap = { unread: '未读', read: '已读' };
                 container.innerHTML =
-                    '<table><thead><tr><th>ID</th><th>接收者ID</th><th>发送者</th><th>类型</th><th>内容</th><th>状态</th><th>时间</th><th>操作</th></tr></thead><tbody>' +
+                    '<table><thead><tr><th>接收者</th><th>发送者</th><th>类型</th><th>内容</th><th>状态</th><th>时间</th><th>操作</th></tr></thead><tbody>' +
                     messages.map(function(m) {
                         return '<tr>' +
-                            '<td>' + m.id + '</td>' +
-                            '<td>' + (m.userId || '-') + '</td>' +
+                            '<td>' + (((window._allUsers || []).find(function(u) { return u.id === m.userId; }) || {}).name || (m.userId || '-')) + '</td>' +
                             '<td>' + escapeHtml(m.senderName || '-') + '</td>' +
                             '<td>' + (typeMap[m.type] || m.type) + '</td>' +
                             '<td style="cursor:pointer;color:#667eea;" onclick="viewMessage(' + m.id + ')">' + escapeHtml((m.content || '').substring(0, 50)) + (m.content && m.content.length > 50 ? '...' : '') + '</td>' +
@@ -3017,7 +3148,7 @@ async function uploadAvatar() {
                 modal.innerHTML =
                     '<div class="modal-content">' +
                         '<div class="modal-header">' +
-                            '<h3>消息详情 #' + m.id + '</h3>' +
+                            '<h3>消息详情</h3>' +
                             '<button onclick="document.getElementById(\'' + modalId + '\').remove();" style="background:none;border:none;font-size:24px;cursor:pointer;">&times;</button>' +
                         '</div>' +
                         '<div class="modal-body">' +
@@ -3025,7 +3156,7 @@ async function uploadAvatar() {
                             '<div class="detail-row"><span class="detail-label">类型：</span><span class="detail-value">' + (typeMap[m.type] || m.type) + '</span></div>' +
                             '<div class="detail-row"><span class="detail-label">状态：</span><span class="detail-value">' + (statusMap[m.status] || m.status) + '</span></div>' +
                             '<div class="detail-row"><span class="detail-label">时间：</span><span class="detail-value">' + (m.sendTime || '') + '</span></div>' +
-                            '<div class="detail-row"><span class="detail-label">接收者ID：</span><span class="detail-value">' + (m.userId || '-') + '</span></div>' +
+                            '<div class="detail-row"><span class="detail-label">接收者：</span><span class="detail-value">' + (((window._allUsers || []).find(function(u) { return u.id === m.userId; }) || {}).name || (m.userId || '-')) + '</span></div>' +
                             '<hr style="margin:10px 0;">' +
                             '<div style="padding:12px;background:#f9f9f9;border-radius:4px;white-space:pre-wrap;">' + escapeHtml(m.content || '') + '</div>' +
                         '</div>' +
@@ -3077,7 +3208,7 @@ async function uploadAvatar() {
                     var list = result.data;
                     container.innerHTML = '<table><thead><tr><th>ID</th><th>标题</th><th>内容</th><th>状态</th><th>发布时间</th><th>操作</th></tr></thead><tbody>' +
                         list.map(function(a) {
-                            return '<tr><td>' + a.id + '</td><td>' + escapeHtml(a.title || '') + '</td><td>' + escapeHtml((a.content || '').substring(0, 50)) + '</td><td>' + (a.status || 'published') + '</td><td>' + (a.createTime || '') + '</td><td><button class="btn btn-outline" onclick="editAnnouncement(' + a.id + ',\'' + escapeHtml(a.title || '') + '\',\'' + escapeHtml(a.content || '') + '\')">编辑</button> <button class="btn btn-outline" onclick="deleteAnnouncement(' + a.id + ')" style="color:#e74c3c;">删除</button></td></tr>';
+                            return '<tr><td>' + a.id + '</td><td>' + escapeHtml(a.title || '') + '</td><td>' + escapeHtml((a.content || '').substring(0, 50)) + '</td><td>' + ({published: '已发布', draft: '草稿'}[a.status] || '未知') + '</td><td>' + (a.createTime || '') + '</td><td><button class="btn btn-outline" onclick="editAnnouncement(' + a.id + ',\'' + escapeHtml(a.title || '') + '\',\'' + escapeHtml(a.content || '') + '\')">编辑</button> <button class="btn btn-outline" onclick="deleteAnnouncement(' + a.id + ')" style="color:#e74c3c;">删除</button></td></tr>';
                         }).join('') + '</tbody></table>';
                 } else {
                     container.innerHTML = '<div style="text-align:center;padding:40px;color:#999;">暂无公告</div>';

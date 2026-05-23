@@ -23,7 +23,7 @@ public class CommentController {
     @GetMapping("/competition/{competitionId}")
     public ResponseEntity<Map<String, Object>> list(@PathVariable Long competitionId) {
         Map<String, Object> response = new HashMap<>();
-        List<Comment> comments = commentService.getByCompetitionId(competitionId);
+        List<Map<String, Object>> comments = commentService.getCommentsWithReplies(competitionId);
         response.put("success", true);
         response.put("data", comments);
         return ResponseEntity.ok(response);
@@ -42,6 +42,8 @@ public class CommentController {
         Long competitionId = request.get("competitionId") != null
                 ? Long.valueOf(request.get("competitionId").toString()) : null;
         String content = (String) request.get("content");
+        Long parentId = request.get("parentId") != null
+                ? Long.valueOf(request.get("parentId").toString()) : null;
 
         if (competitionId == null || content == null || content.trim().isEmpty()) {
             response.put("success", false);
@@ -50,9 +52,9 @@ public class CommentController {
         }
 
         boolean success = commentService.addComment(competitionId, userInfo.getUserId(),
-                userInfo.getName(), content.trim());
+                userInfo.getName(), content.trim(), parentId);
         response.put("success", success);
-        response.put("message", success ? "评论成功" : "评论失败");
+        response.put("message", success ? "评论成功" : "回复成功");
         return ResponseEntity.ok(response);
     }
 }
