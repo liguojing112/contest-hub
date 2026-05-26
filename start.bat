@@ -29,7 +29,10 @@ echo Starting server...
 echo Log will be saved to app.log
 echo.
 
-java -jar "%~dp0backend\target\jingsai-1.0.0.jar" > app.log 2>&1
+set DB_PASS=root123
+if not "%1"=="" set DB_PASS=%1
+
+java -jar "%~dp0backend\target\jingsai-1.0.0.jar" --spring.datasource.password=%DB_PASS% > app.log 2>&1
 
 echo.
 echo ============================================
